@@ -22,3 +22,7 @@ wave_set = data.get_data()
 # you can get the metadata included in the file and a list of all channels:
 print(data.info)
 print(data.ch_names)
+#join
+hyper_element = " ".join(data.ch_names)
+
+print(hyper_element)
