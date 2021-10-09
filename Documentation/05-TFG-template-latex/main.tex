@@ -166,8 +166,8 @@ Mental workload is defined as “the cognitive and psychological effort to concl
 There are two main categories to measure workload:
 \\
 \begin{itemize}
-\item   -	Subjective measures: Being the most used to asses mental workload, the NASA Task Load Index (TLX) a prominent way to gain insight on perceived workload from the subject based on a weighted average of six sub-variables: mental demand, physical demand, temporal demand, performance, effort and frustration. Widely used in aviation to assess mental workload of the pilot but it is highly subjective
-\item -	Physiological measures: Providing a more reliable data by measuring physiological dynamic changes which cannot be controlled consciously, so that is why it’s more reliable. Readings such as electrocardiogram (ECG), electromyograph, electroencephalogram (EEG), photoplethysmography, respiration rate sensors, electro-dermal activity (EDA), oxygen density in the blood in the brain, and eye movement trackers... The combination of inputs reports better accuracy than the analysis if each one independently.
+\item Subjective measures: Being the most used to asses mental workload, the NASA Task Load Index (TLX) a prominent way to gain insight on perceived workload from the subject based on a weighted average of six sub-variables: mental demand, physical demand, temporal demand, performance, effort and frustration. Widely used in aviation to assess mental workload of the pilot but it is highly subjective
+\item Physiological measures: Providing a more reliable data by measuring physiological dynamic changes which cannot be controlled consciously, so that is why it’s more reliable. Readings such as electrocardiogram (ECG), electromyograph, electroencephalogram (EEG), photoplethysmography, respiration rate sensors, electro-dermal activity (EDA), oxygen density in the blood in the brain, and eye movement trackers... The combination of inputs reports better accuracy than the analysis if each one independently.
 \end{itemize}
 \leavevmode\\
 In this paper the approach is to investigate the ability of 1D-CNN models to recognise two types of mental load from EEG signals and to generalise the model to a population not seen in the training set. They use N-back test (memory demanding games requiring the resolution of simple arithmetic operations adjusting workload) to induce low and medium workload and to classify a simple neural network (NN) it’s trained using only the power spectrum of theta waves. Proposing a personalized model for each individual and a generalist one, preform the models in a dataset of 16 subjects showing outstanding results in a leave-one-out subject test and so generalizing to new unseen subjects.
@@ -185,12 +185,28 @@ In conclusion its reported 95\% confidence interval for each class computed for 
 %\label{subsec-work2}
 
 
-\section{Conclusions}
+\section{Objectives}
+\label{sec-objectives}
+There are two main objectives in this paper. The first objective is to find the best way to treat, analyse and classify data before feeding it to the deep learning algorithms, for example, as a continuous stream of sequence, dividing data per subject…  or trying different test/train strategies such as leave one out, 50/50… The second main objective of this paper is to try to find which algorithms architectures have better results with the data, for example CNN, Transformer, SVM…
+\\
+
+\section{Tasks}
+\label{sec-tasks}
+\\
+To start from somewhere the first task will be to use an already done deep learning algorithm from the research group IAM from the CVC, which is working on a framework to determine the optimal architecture for cognitive state recognition from EEG signals, with the objective to answer different questions:
+\begin{itemize}
+  \item How to combine the signals to create the input features for feature extraction? In this case, having 14 sensors x 5 waves, so 70 raw signals. These signals can be concatenated, or projected. As well, in case of projection, the weights can be equal or learned.
+  \item Which neural network is the best performer?
+  \item Is it better to ensemble the different classifiers before combining the signals?
+\end{itemize}
+\leavevmode\\
+This framework was originally intended to study brain workload, so, within this framework, the idea is to modify it to fulfil the objective of this paper, clinic seizure detection. In this paper, different strategies will be applied on the input data of the algorithm to further study it’s capabilities.
+\\
+If this itself it’s already done within the period of completion of this research and there is still time for more tasks, a new neural network will be created. A deep search on what architectures there are, and which suits better for this work will be done and a new model will be created from scratch.
 
 
 
 \section*{Agraïments}
-
 
 \begin{thebibliography}{11}
 
