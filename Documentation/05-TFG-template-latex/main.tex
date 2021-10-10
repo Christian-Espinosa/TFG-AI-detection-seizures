@@ -111,9 +111,9 @@ when the subject is having a seizure.
 \\
 Neural oscillations are rhythmic or repetitive patterns of neural activity in the central nervous system which can be driven by mechanisms within individual neurons or by interactions. Since 1824 neural oscillations have been observed, fifty years later intrinsic oscillatory behaviour was encountered in vertebrate neurons, but the purpose of these is yet to be fully understood.
 \\
-In order to understand better brain activity this paper tries to dig deeper using new technology like deep learning to try to understand what humans are incapable of doing. First of all, it will be needed an inside view on how the brain works to have a hint on how to extract or intercept information from the neurons to process externally in a computer as well as a view on how deep learning algorithm’s function and get results from data, because it’s the best way to process and get the most out of it. Afterwards an insight of previous papers is given to set a view point on how research has been made up until this point. A well-known database (CHB-MIT) is introduced of encephalograms collected from 23 subject with interactable seizures that has been used in previous research.
+In order to understand better brain activity in this TFG tries to dig deeper using new technology like deep learning to try to understand what humans are incapable of doing. First of all, it will be needed an inside view on how the brain works to have a hint on how to extract or intercept information from the neurons to process externally in a computer as well as a view on how deep learning algorithm’s function and get results from data, because it’s the best way to process and get the most out of it. Afterwards an insight of previous papers is given to set a view point on how research has been made up until this point. A well-known database (CHB-MIT) is introduced of encephalograms collected from 23 subject with interactable seizures that has been used in previous research.
 \\
-Once everything is acknowledged objectives of this paper are settled for further research on this issue. First of all, data planning and different treatment procedures are important to see how algorithms behave giving better or worse results, as well as which algorithm architectures are better to process EEG data. Finally, once all the research is done the classifier is to be expected to classify moments where seizures occur on the patients in a given moment.
+Once everything is acknowledged objectives of in this TFG are settled for further research on this issue. First of all, data planning and different treatment procedures are important to see how algorithms behave giving better or worse results, as well as which algorithm architectures are better to process EEG data. Finally, once all the research is done the classifier is to be expected to classify moments where seizures occur on the patients in a given moment.
 \\
 
 \section{Brain}
@@ -159,18 +159,18 @@ A lot of research has been made of the brain to further understand it’s capabi
 \\
 \subsection{Mental Workload Detection based on EEG Analysis}
 \label{subsec-work1}
-In this paper a study of mental workload is done in order to work more efficiently, healthier and to avoid accidents since workload compromises both performance and awareness. The use of EEG signals has a high correlation with specific cognitive and mental states such as workload, proposing a binary neural network to classify EEG features across different mental workloads.
+A study of mental workload is done in order to work more efficiently, healthier and to avoid accidents since workload compromises both performance and awareness. The use of EEG signals has a high correlation with specific cognitive and mental states such as workload, proposing a binary neural network to classify EEG features across different mental workloads.
 \\
 Mental workload is defined as “the cognitive and psychological effort to conclude a task”, observing that depending if workload is too heavy or too light this can affect human performance. Also, since workload involves neuro-physiologic, and perceptual processes it is affected by individual capabilities, motivation to preform, physical and emotional state which it’s multifaceted nature of workload prevents it of studying directly but it is feasible to infer this from a number of quantifiable variables.
 \\
 There are two main categories to measure workload:
 \\
 \begin{itemize}
-\item Subjective measures: Being the most used to asses mental workload, the NASA Task Load Index (TLX) a prominent way to gain insight on perceived workload from the subject based on a weighted average of six sub-variables: mental demand, physical demand, temporal demand, performance, effort and frustration. Widely used in aviation to assess mental workload of the pilot but it is highly subjective
+\item Subjective measures: Being the most used to asses mental workload, the NASA Task Load Index (TLX) a prominent way to gain insight on perceived workload from the subject based on a weighted average of six sub-variables: mental demand, physical demand, temporal demand, performance, effort and frustration. Widely used in aviation to assess mental workload of the pilot but it is highly subjective.
 \item Physiological measures: Providing a more reliable data by measuring physiological dynamic changes which cannot be controlled consciously, so that is why it’s more reliable. Readings such as electrocardiogram (ECG), electromyograph, electroencephalogram (EEG), photoplethysmography, respiration rate sensors, electro-dermal activity (EDA), oxygen density in the blood in the brain, and eye movement trackers... The combination of inputs reports better accuracy than the analysis if each one independently.
 \end{itemize}
 \leavevmode\\
-In this paper the approach is to investigate the ability of 1D-CNN models to recognise two types of mental load from EEG signals and to generalise the model to a population not seen in the training set. They use N-back test (memory demanding games requiring the resolution of simple arithmetic operations adjusting workload) to induce low and medium workload and to classify a simple neural network (NN) it’s trained using only the power spectrum of theta waves. Proposing a personalized model for each individual and a generalist one, preform the models in a dataset of 16 subjects showing outstanding results in a leave-one-out subject test and so generalizing to new unseen subjects.
+The approach is to investigate the ability of 1D-CNN models to recognise two types of mental load from EEG signals and to generalise the model to a population not seen in the training set. They use N-back test (memory demanding games requiring the resolution of simple arithmetic operations adjusting workload) to induce low and medium workload and to classify a simple neural network (NN) it’s trained using only the power spectrum of theta waves. Proposing a personalized model for each individual and a generalist one, preform the models in a dataset of 16 subjects showing outstanding results in a leave-one-out subject test and so generalizing to new unseen subjects.
 \\
 The method to obtain data all 16 subjects had to first watch a 10-minute relaxing video and afterwards do the N-back-test low, medium and high difficulty. Finally subjects ask a TLX questionnaire for subjective perception of the test difficulty and workload.
 \\
@@ -179,20 +179,19 @@ sigma=1 using the mean and standard deviation of the training set.
 \\
 Networks have a hidden layer of 128 neurons with ReLU as the activation function. Before the classification layer a dropout layer was added to avoid overfitting and all models have been trained using weighted cross-entropy loss, to compensate the different lengths of base line and workload phases which introduces unbalance in data samples.
 \\
-In conclusion its reported 95\% confidence interval for each class computed for all subjects and recall above 90%. It is suggested to use longer windows to capture EEG non stationary nature.
-
+In conclusion its reported 95\% confidence interval for each class computed for all subjects and recall above 90\%. It is suggested to use longer windows to capture EEG non stationary nature.
+\\
 %\subsection{EEG SIGNAL DIMENSIONALITY REDUCTION AND CLASSIFICATION USING TENSOR DECOMPOSITION AND DEEP CONVOLUTIONAL NEURAL NETWORKS}
 %\label{subsec-work2}
 
 
 \section{Objectives}
 \label{sec-objectives}
-There are two main objectives in this paper. The first objective is to find the best way to treat, analyse and classify data before feeding it to the deep learning algorithms, for example, as a continuous stream of sequence, dividing data per subject…  or trying different test/train strategies such as leave one out, 50/50… The second main objective of this paper is to try to find which algorithms architectures have better results with the data, for example CNN, Transformer, SVM…
+There are two main objectives in this TFG. The first objective is to find the best way to treat, analyse and classify data before feeding it to the deep learning algorithms, for example, as a continuous stream of sequence, dividing data per subject…  or trying different test/train strategies such as leave one out, 50/50… The second main objective is to try to find which algorithms architectures have better results with the data, for example CNN, Transformer, SVM…
 \\
 
 \section{Tasks}
 \label{sec-tasks}
-\\
 To start from somewhere the first task will be to use an already done deep learning algorithm from the research group IAM from the CVC, which is working on a framework to determine the optimal architecture for cognitive state recognition from EEG signals, with the objective to answer different questions:
 \begin{itemize}
   \item How to combine the signals to create the input features for feature extraction? In this case, having 14 sensors x 5 waves, so 70 raw signals. These signals can be concatenated, or projected. As well, in case of projection, the weights can be equal or learned.
@@ -200,37 +199,53 @@ To start from somewhere the first task will be to use an already done deep learn
   \item Is it better to ensemble the different classifiers before combining the signals?
 \end{itemize}
 \leavevmode\\
-This framework was originally intended to study brain workload, so, within this framework, the idea is to modify it to fulfil the objective of this paper, clinic seizure detection. In this paper, different strategies will be applied on the input data of the algorithm to further study it’s capabilities.
+This framework was originally intended to study brain workload, so, within this framework, the idea is to modify it to fulfil the objective of clinic seizure detection. In this TFG, different strategies will be applied on the input data of the algorithm to further study it’s capabilities.
 \\
-If this itself it’s already done within the period of completion of this research and there is still time for more tasks, a new neural network will be created. A deep search on what architectures there are, and which suits better for this work will be done and a new model will be created from scratch.
+If this itself it’s already done within the period of completion of this research and there is still time for more tasks, a new neural network will be created. A deep search on what architectures there are, and which suits better for this work will be done and a new model will be created from scratch. Afterword the models will be compared and reported to learn which preform better in different conditions.
+\\
+Diferent tasks to be done:
+\begin{figure}[!h]
+  \centering
+    \includegraphics[width=0.4\textwidth]{img/Tasks.png}
+    \caption{General Tasks of the TFG}
+    \label{fig-exemple}
+  \end{figure}
+
+Note that “Write Work Reaserch” tasks are before every meeting.
+\leavevmode\\
+
+\begin{figure*}[!h]
+  \centering
+    \includegraphics[width=1\textwidth]{img/Gantt.png}
+    \caption{Gantt Diagram of the project}
+    \label{fig-exemple}
+  \end{figure*}
+
+%\section*{Agraïments}
+
+%\begin{thebibliography}{11}
+
+%\bibitem{neural_oscilation}
+%https://en.wikipedia.org/wiki/Neural\_oscillation
+
+%\bibitem{seizure}
+%https://en.wikipedia.org/wiki/Seizure
+
+%\bibitem{latex}
+%http://en.wikibooks.org/wiki/LaTeX
+
+%\bibitem{the}
+%http://www.acnweb.org/acta/2002\_18\_2\_104.pdf
+
+%\bibitem{other projects}
+%https://arxiv.org/pdf/1908.10432v1.pdf
+
+%\bibitem{dataset}
+%https://paperswithcode.com/dataset/chb-mit
 
 
 
-\section*{Agraïments}
-
-\begin{thebibliography}{11}
-
-\bibitem{neural_oscilation}
-https://en.wikipedia.org/wiki/Neural\_oscillation
-
-\bibitem{seizure}
-https://en.wikipedia.org/wiki/Seizure
-
-\bibitem{latex}
-http://en.wikibooks.org/wiki/LaTeX
-
-\bibitem{the}
-http://www.acnweb.org/acta/2002\_18\_2\_104.pdf
-
-\bibitem{other projects}
-https://arxiv.org/pdf/1908.10432v1.pdf
-
-\bibitem{dataset}
-https://paperswithcode.com/dataset/chb-mit
-
-
-
-\end{thebibliography}
+%\end{thebibliography}
 
 \end{document}
 
