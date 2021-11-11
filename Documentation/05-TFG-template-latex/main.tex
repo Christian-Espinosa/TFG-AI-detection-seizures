@@ -100,7 +100,7 @@ when the subject is having a seizure.
 %\end{abstract}
 \end{@twocolumnfalse}]
 
-\blfootnote{$\bullet$ E-mail de contacte: 1459024@uab.cat}
+\blfootnote{$\bullet$ E-mail de contacte: 1459024 @uab.cat}
 \blfootnote{$\bullet$ Menció realitzada: Computació }
 \blfootnote{$\bullet$ Treball tutoritzat per: Aura Hernández Sabaté (Ciencies de la Computació)}
 \blfootnote{$\bullet$ Curs 2021/22}
@@ -116,78 +116,21 @@ In order to understand better brain activity in this TFG tries to dig deeper usi
 Once everything is acknowledged objectives of in this TFG are settled for further research on this issue. First of all, data planning and different treatment procedures are important to see how algorithms behave giving better or worse results, as well as which algorithm architectures are better to process EEG data. Finally, once all the research is done the classifier is to be expected to classify moments where seizures occur on the patients in a given moment.
 \\
 
-\section{Brain}
-\label{sec-brain}
-\subsection{Neuron and neural activity}
-\label{subsec-neuron}
 
-To further understand how brain activity works we first need to study a single neuron and its purpose. A neuron is an electrically excitable cell that has the function to communicate with other cells. It does it by nearly touching other cells called synapsis, transmits the message through its axon and delivers the message by synapsis to another cell. Neurons are typically classified into types based on their function:
-\\
-\begin{itemize}
-  \item Sensory neurons: Which respond to stimuli of the sensory organs and send the signals to the spinal cord or brain.
-  \item Motor neurons: Its axons originate in the brain and spinal cord and innervate the muscles to produce muscle movements.
-  \item Projection fiber: Are neurons found in the central nervous system and only establish synapses with other neurons, these consist of efferent and afferent fibers uniting the cortex with the lower parts of the brain and with the spinal cord.
-  \item Interneuron: Is a neuron of the central nervous system, usually small and with a short axon, that interconnects with other neurons, but never with sensory receptors or muscle fibres, allowing it to perform more complex functions.
-\end{itemize}
-\leavevmode\\
-Neurons transmit electrical waves originating from a transient change of permeability in the plasma membrane. Their propagation is due to the existence of a potential difference that arises due to different concentrations of ions on either side of the membrane, as described by the Nernst potential, between the inner and outer part of the cell (typically -70 mV). For the transmission of nervous impulses to other neurons, these do it by synapse, being a structure to pass electrical or chemical signals to another neuron or effector cell, there are two types of synapses:
-\\
-\begin{itemize}
-  \item	Chemical synapse: Electrical activity in the presynaptic neuron is converted into the release of a neurotransmitter that binds to the receptors located in the plasma membrane of the postsynaptic cell.
-  \item	Electrical synapse: Is one in which transmission between the first neuron and the second is not by the secretion of a neurotransmitter, but by the passage of ions from one cell to another through gap junctions, small channels formed by the coupling of protein complexes, based on connexins, in closely adherent cells.
-\end{itemize}
-
-\leavevmode\\
-These electrochemical processes when large numbers of neurons show synchronized activity, electric fields that they generate can be large enough to be detected outside the skull, and so using electroencephalography (EEG) or magnetoencephalography (MEG) brain activity can be recorded.
-\\
-
-\subsection{Structure}
-\label{subsec-structure}
-\leavevmode\\
-Now that we know where brain activity originates from, we can further study how the brain structures. There are many parts in the brain, but for now we are going to focus on the cerebrum because it initiates and coordinates movement, regulates temperatures, speech, judgement, reasoning, problem-solving, emotions, learning…
-\\
-The cerebrum, it’s the largest part of the brain, it’s divided by the medial longitudinal fissure in two hemispheres, each of these hemispheres has an outer layer of grey matter, the cerebral cortex and an inner layer of white matter. The fact that these are separated gives the opportunity for lateralisation of brain functions, which is the tendency of neurological functions to specialise in one hemisphere or the other, but even though the cerebrum is separated, these are connected by the corpus callosum.
-\\
-The cortex is mapped into fifty different functional areas known as Brodmann’s areas, defined by its cytoarchitecture (cellular composition), or histological structure and organization of cells. One scheme widely used (from Korbinian Brodmann) splits the cortex into 52 different numbered areas of different cellular structure and different functions.
-\\
-Having clarified this brain structure, obtaining data with electrodes from brain activity, positioning of these is something to keep in touch with depending on what it’s being studied. The same goes for defining the dataset train and test data, to feed as input to the deep learning algorithm, opening a new field on how to treat and subdivide data to make the most of it.
-\\
-
-\section{Related Work}
-\label{sec-related-work}
-A lot of research has been made of the brain to further understand it’s capabilities using deep learning algorithms. Below are different projects attempting to interpret and process EEG data in order to define a baseline of what has been done so far. 
-\\
-\subsection{Mental Workload Detection based on EEG Analysis}
-\label{subsec-work1}
-A study of mental workload is done in order to work more efficiently, healthier and to avoid accidents since workload compromises both performance and awareness. The use of EEG signals has a high correlation with specific cognitive and mental states such as workload, proposing a binary neural network to classify EEG features across different mental workloads.
-\\
-Mental workload is defined as “the cognitive and psychological effort to conclude a task”, observing that depending if workload is too heavy or too light this can affect human performance. Also, since workload involves neuro-physiologic, and perceptual processes it is affected by individual capabilities, motivation to preform, physical and emotional state which it’s multifaceted nature of workload prevents it of studying directly but it is feasible to infer this from a number of quantifiable variables.
-\\
-There are two main categories to measure workload:
-\\
-\begin{itemize}
-\item Subjective measures: Being the most used to asses mental workload, the NASA Task Load Index (TLX) a prominent way to gain insight on perceived workload from the subject based on a weighted average of six sub-variables: mental demand, physical demand, temporal demand, performance, effort and frustration. Widely used in aviation to assess mental workload of the pilot but it is highly subjective.
-\item Physiological measures: Providing a more reliable data by measuring physiological dynamic changes which cannot be controlled consciously, so that is why it’s more reliable. Readings such as electrocardiogram (ECG), electromyograph, electroencephalogram (EEG), photoplethysmography, respiration rate sensors, electro-dermal activity (EDA), oxygen density in the blood in the brain, and eye movement trackers... The combination of inputs reports better accuracy than the analysis if each one independently.
-\end{itemize}
-\leavevmode\\
-The approach is to investigate the ability of 1D-CNN models to recognise two types of mental load from EEG signals and to generalise the model to a population not seen in the training set. They use N-back test (memory demanding games requiring the resolution of simple arithmetic operations adjusting workload) to induce low and medium workload and to classify a simple neural network (NN) it’s trained using only the power spectrum of theta waves. Proposing a personalized model for each individual and a generalist one, preform the models in a dataset of 16 subjects showing outstanding results in a leave-one-out subject test and so generalizing to new unseen subjects.
-\\
-The method to obtain data all 16 subjects had to first watch a 10-minute relaxing video and afterwards do the N-back-test low, medium and high difficulty. Finally subjects ask a TLX questionnaire for subjective perception of the test difficulty and workload.
-\\
-To get the data itself EEG recordings were done using EMOTIV EPOC+ headset which has 14 electrodes placed according to the 10/20 system which provide raw data and power spectrum for the main brain rhythms (theta, alpha, beta low, beta high, and), at 128 Hz and 8 Hz, respectively. Data had to be filtered from noise with Inter Quartile Range (IQR) strategy to detect outlier values associated to muscular movement wave peaks. In this work, power spectrum used was from theta wave (4-8Hz) sampled at 8Hz feed into the models in 5 second windows of every electrode (14 EEG sensors). Variables were normalized to have 0 mean and
-sigma=1 using the mean and standard deviation of the training set. 
-\\
-Networks have a hidden layer of 128 neurons with ReLU as the activation function. Before the classification layer a dropout layer was added to avoid overfitting and all models have been trained using weighted cross-entropy loss, to compensate the different lengths of base line and workload phases which introduces unbalance in data samples.
-\\
-In conclusion its reported 95\% confidence interval for each class computed for all subjects and recall above 90\%. It is suggested to use longer windows to capture EEG non stationary nature.
-\\
-%\subsection{EEG SIGNAL DIMENSIONALITY REDUCTION AND CLASSIFICATION USING TENSOR DECOMPOSITION AND DEEP CONVOLUTIONAL NEURAL NETWORKS}
-%\label{subsec-work2}
+\input{related_work.tex}
 
 
 \section{Objectives}
 \label{sec-objectives}
-There are two main objectives in this TFG. The first objective is to find the best way to treat, analyse and classify data before feeding it to the deep learning algorithms, for example, as a continuous stream of sequence, dividing data per subject…  or trying different test/train strategies such as leave one out, 50/50… The second main objective is to try to find which algorithms architectures have better results with the data, for example CNN, Transformer, SVM…
+There are two main objectives in this TFG. The first objective is to find the best way to treat, analyse and classify data before feeding it to the deep learning algorithms, for example, as a continuous stream of sequence, dividing data per subject…  or trying different test/train strategies such as leave one out, 50/50… The second main objective is to try to find which algorithms architectures have better results with the data, for example CNN, Transformer, SVM.
+\\
+To fulfil the objectives is crucial to define smaller objectives to make work easier. Within the first objectives there are several important parts. First of all, raw data must be readable, as the data base CHB-MIT is in European Data Format (EDF), a standard file format designed for exchange and storage of medical time series, so all files in the dataset are “.edf” or “.edf.seizures”. This last format can be a problem for most common edf readers because of its “.seizures” extension, so further programs will be needed to obtain the data from these files.
+\\
+The next objective after obtaining data, is to save the raw data in “.parquet”, because it’s the type of format needed as input in the models lend by the CVC research group. In this stage data filtering should be considered as well as being able to plot data if needed. The next file to read the data is MainSource\_vr1.py, has options of filtering or splitting data to prepare data before entering the models. 
+\\
+Once the data if finally ready to be used the next main objective is to define the way data is going to be treated to get the best results. There are different models depending on the dimensions of the data input, and so different tactics of data treatment are done. In this objective the idea is to obtain the different outputs and plot the data for further investigation.
+\\
+Finally, a final review of the results is done to determine the best way to treat EEG signals and what models preform better in different circumstances. So, the program needs to be executed in many different ways to have a large view and a better understanding on how to process and classify EEG signals.
 \\
 
 \section{Tasks}
@@ -220,6 +163,23 @@ Note that “Write Work Reaserch” tasks are before every meeting.
     \caption{Gantt Diagram of the project}
     \label{fig-exemple}
   \end{figure*}
+
+\subsection{Dataset}
+\leavevmode\\
+The dataset is data collected from the Children’s Hospital Boston, consisting in EEG recordings of subjects with intractable seizures. The folders classify in 23 cases from 22 subjects (case chb21 and chb1 are the same but 1.5 years apart). The subject’s personal information gender and age is in a separate file called SUBJECT-INFO added in this paper as subject\_info.csv.
+\\
+Each case contains between 9 and 42 .edf files. There are .edf files of EEG signals without seizures and others with recordings of seizures, these defined in RECORDS-WITH-SEIZURES. The files with seizures have the extension .edf.seizures which disables the possibility of accessing the file with a normal edf reader library.
+\\
+Most cases have 1 hour of EEG recordings, but some have 1 to 4 hours depending on the case, split between 9 to 42 edf recordings, recorded at 256Hz in 16 bit resolution.
+\\
+
+
+\input{Annex.tex}
+
+
+\section{Bibliography}
+\label{sec-bibliography}
+\include{ref.bib}
 
 %\section*{Agraïments}
 
