@@ -5,7 +5,7 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 import os, sys
-import lib.Format_edf_to_paquet as fra
+import library.Format_edf_to_paquet as fra
 import matplotlib.pyplot as plt
 
 from scipy.signal import freqz
@@ -99,11 +99,18 @@ stop = timeit.default_timer()
 print('Time: ', stop - start)  
 
 # %%
+
+#LABELING
+
 #Seizures file
-name_edf_seizures = "chb01_03s"
-file_name = os.path.abspath("D:\\UAB\\4to\\TFG-AI-detection-seizures\\" + "Data/edf/" + name_edf_seizures + ".edf")
-edf_f = pyedflib.EdfReader(file_name)
-df = fra.set_seizure_labeling(df, edf_f)
+file_name = os.path.abspath("D:\\UAB\\4to\\TFG-AI-detection-seizures\\" + "Data/edf/" + name_edf_seizures + ".edf.seizures")
+dec = open(file_name)
+x = os.read(dec)
+
+#Puede ayudar
+#https://www.mathworks.com/matlabcentral/answers/225716-how-i-can-read-chb01_03-edf-seizures-file-from-chb-mit-database-in-matlab-as-i-am-using-this-file-f
+
+#df = fra.set_seizure_labeling(df, edf_f)
 
 plt.show()
 
