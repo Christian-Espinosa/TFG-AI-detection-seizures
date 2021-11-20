@@ -18,15 +18,11 @@ from eeg_models_layers import *
 TFG: Quan s'hagi testejat els models amb arquitectura fixada, aquesta funció no serà necessaria
 """
 def ConVNet(n_features,ker_temp):
-   #Definimos padding para que la imagen siga teniendo el mismo tamaño
+   
    pad_temp=tuple(((np.array(ker_temp)-1)/2).astype(int))
    
-   #
    block1 = nn.Sequential(
-            #Configurar padding para no comerme los bordes
             nn.Conv2d(1, n_features, kernel_size=ker_temp, padding=pad_temp),
-            #Regularizador, los que tengan probabilidad cerca de 0, no me salgan nan
-            # Introduce 0 para regularizar - - > investiga
             nn.Dropout(0.1),
         #    nn.BatchNorm2d(n_features),
             nn.ReLU(inplace=True),
@@ -36,9 +32,8 @@ def ConVNet(n_features,ker_temp):
 
             # nn.Conv2d(n_features, n_features, kernel_size=ker_temp, padding=pad_temp),
             # nn.ReLU(inplace=True),
-            # Reucir la dimensionalidad, extrae la informacion resumen de donde estan las formas buscadas en la imagen
             nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
-            ).cuda()#REVISAR - Aplicar el tensor, compilació del bloc perque ho entengui el ordenador, de manera mas directa
+            ).cuda()
 
    block2 = nn.Sequential(
             nn.Conv2d(n_features, 2 * n_features, kernel_size=ker_temp, padding=pad_temp),
@@ -123,10 +118,10 @@ class CNN_ConcatInput(nn.Module):
         
     
         
-        ############# ARCHITECTURE
+        ##### ARCHITECTURE
         ## input block: projection (None)
         
-        ############# convolutional block for temporal signal processing
+        ## convolutional block for temporal signal processing
         """
             TFG: Cal posar aquest tros en aquest format i replicar-ho a tot arreu:       
         #        self.ConvBlockList=[]
@@ -140,28 +135,20 @@ class CNN_ConcatInput(nn.Module):
          """
         kern_conv=convnet_params['kernel_size']  
         n_features=convnet_params['Nneurons']
-
-        #Pytorch, define arquitectura basica de la red convolucional segun hyperparametros
-        #Aruitectura para extraer las caracteristicas
         self.conv_net=ConVNet(n_features,kern_conv)
 
      
-        ############ output block: projection channel (None), 
+        ## output block: projection channel (None), 
         ## projection signal (AvgPool), fc layers and classifier
         
         ### projector: has to be implemented in forward evaluation if
         ### you want independence from input signal size
         last_block=self.conv_net[-1]
-
-        #Buscar que hace el sequencial!
         n_output_loc=last_block[0].out_channels
-
-        #Que hacemos con las caracateristicas, como combinamos las caracts para clasificar
         self.outconv_proj= OutPutNetProj((1,0),n_output_loc)
         ### classification fc layer
         n_classes=outputmodule_params['n_classes']
         
-        #Combinacion lineal de las caracteristicas
         self.fc_out = nn.Linear(n_output_loc, n_classes)
 
         # weight init
@@ -170,12 +157,10 @@ class CNN_ConcatInput(nn.Module):
     def forward(self, x):
 
         # input is (NSamp, NChannels, LSignal) 
-        #nSamples = finestres per subjecte
-        #nChannels = 23 electrodes (como los metemos? juntos, por separado?)
         # LSignal=L (1 dim); LSignal=(W,H) (2 dim); LSignal=(W,H,L)
 
         ## Input Signal Projection: Concatenation
-        x=x.view(x.size(0), -1) #[NSamples,NChannels*L]
+        x=x.view(x.size(0), -1) #[N,NChannels*L]
        
         x = torch.unsqueeze(x, dim=1) # (N, 1, NChannels*L)
         #Trick to use conv2d operator instead of conv1

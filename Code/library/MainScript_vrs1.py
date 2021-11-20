@@ -1,4 +1,8 @@
 """
+####
+# Original name changed MainScript_vrs1 --> DataParser.py
+####
+
 SCRIPT reads .parquet files that contain the power spectra for each workload phase and extracts the features that are the input for the classifiers.
 This structure has 2 main steps:
     1. Filter signals using an Inter Quartile Range (IQR filtering). IQR parameters can be computed for each subject or for a training set of 
@@ -25,8 +29,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from eeg_globals import *
+from signals_functions import *
 
-user='AuraCVC'
+user='Christian'
 
 if user=='Deb':
     proj_dir=r'J:\Experiments\EPilots\ML2\Code\Python\epilots_proj\code\CVCEEGFunctions'
@@ -50,10 +56,10 @@ elif user=='AuraCVC':
 
 elif user=='Christian':
     proj_dir = r'D:\UAB\4to\TFG-AI-detection-seizures'
-    eeglib = os.path.join(proj_dir,'Data/egg')
-    dataframes_dir = os.path.join(proj_dir,'dataframes')
+    eeglib = os.path.join(proj_dir,'')
+    dataframes_dir = os.path.join(proj_dir,'Data/CVC/dataframes')
     Data_dir= os.path.join(proj_dir,'Data/parquet')
-    OutPut_dir = os.path.join(proj_dir,'results')
+    OutPut_dir = os.path.join(proj_dir,'Data/CVC/results')
     
 else:
     proj_dir = r'C:\Users\aura.CVC\OneDrive - Universitat Autònoma de Barcelona\ePilots\ML2'
@@ -69,9 +75,6 @@ sys.path.append(eeglib)
 sys.path.append(dataframes_dir)
 sys.path.append(Data_dir)
 sys.path.append(OutPut_dir)
-
-from eeg_globals import *
-from signals_functions import *
 
 
 
