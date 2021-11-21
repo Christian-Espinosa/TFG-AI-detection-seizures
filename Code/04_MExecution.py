@@ -1,9 +1,4 @@
 
-
-#Based on Check_ModelsArchitecture_Script
-from library.CNN_models_vrs1 import *
-#from eeg_util_data import * #---> What?
-
 ## 0. INPUT PACKAGES
 # I/O
 import os
@@ -24,9 +19,12 @@ from sklearn import metrics
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+#Based on Check_ModelsArchitecture_Script
+from library.CNN_models_vrs1 import *
+#from eeg_util_data import * #---> What?
 #-----------Configure Data Set-----------
-exec(open('file.py').read())
+path_chuncker = os.path.abspath("d:\\UAB\\4to\\TFG-AI-detection-seizures\\Code\\library\\MainScript_vrs1.py")
+exec(open(path_chuncker).read())
 
 #-----------Define Hyperparameters-----------
 projmodule_params=None

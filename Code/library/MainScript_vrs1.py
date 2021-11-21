@@ -55,11 +55,11 @@ elif user=='AuraCVC':
     OutPut_dir = os.path.join(proj_dir,'results')
 
 elif user=='Christian':
-    proj_dir = r'D:\UAB\4to\TFG-AI-detection-seizures'
+    proj_dir = r'D:\UAB\4to'
     eeglib = os.path.join(proj_dir,'')
-    dataframes_dir = os.path.join(proj_dir,'Data/CVC/dataframes')
-    Data_dir= os.path.join(proj_dir,'Data/parquet')
-    OutPut_dir = os.path.join(proj_dir,'Data/CVC/results')
+    dataframes_dir = os.path.join(proj_dir,'DataSetTFG/CVC/dataframes')
+    Data_dir= os.path.join(proj_dir,'DataSetTFG/CVC/parquet')
+    OutPut_dir = os.path.join(proj_dir,'DataSetTFG/CVC/results')
     
 else:
     proj_dir = r'C:\Users\aura.CVC\OneDrive - Universitat Autònoma de Barcelona\ePilots\ML2'
