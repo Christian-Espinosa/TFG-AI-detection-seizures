@@ -2,15 +2,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 import numpy as np
 
 # OWN FUNCTIONS
 """
 TFG: Check import has no problem (sintax)
 """
-from eeg_models_init import *
-from eeg_util_models import * 
-from eeg_models_layers import *
+from .eeg_models_init import *
+from .eeg_util_models import * 
+from .eeg_models_layers import *
 # ========================================================================
 # CONVOLUTIONAL BLOCK  
 """
@@ -94,14 +95,14 @@ class CNN_ConcatInput(nn.Module):
              convnet_params['Nneurons'].append([16,32,64])
              convnet_params['Nneurons'].append([128,128,128])
 
-    2.  projlayer_params['proj_type']: type of projection
-        projlayer_params['n_channels']: number of input channels
-        projlayer_params['Nneurons']: number of neurons for first layer 
+    2.  projmodule_params['proj_type']: type of projection
+        projmodule_params['n_channels']: number of input channels
+        projmodule_params['Nneurons']: number of neurons for first layer 
         if proj_type is 'Avg', omit parameter 
             
-             projlayer_params=None
+             projmodule_params=None
         
-    3.  outputlayer_params['n_classes']=number of output classes
+    3.  outputmodule_params['n_classes']=number of output classes
 
     """
     def __init__(self, projmodule_params,convnet_params,outputmodule_params):

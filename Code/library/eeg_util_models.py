@@ -1,5 +1,5 @@
 import torch
-from CNN_models_vrs1 import *
+from .CNN_models_vrs1 import *
 
 
 """

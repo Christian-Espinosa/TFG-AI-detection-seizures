@@ -1,8 +1,4 @@
 """
-####
-# Original name changed MainScript_vrs1 --> DataParser.py
-####
-
 SCRIPT reads .parquet files that contain the power spectra for each workload phase and extracts the features that are the input for the classifiers.
 This structure has 2 main steps:
     1. Filter signals using an Inter Quartile Range (IQR filtering). IQR parameters can be computed for each subject or for a training set of 
@@ -29,8 +25,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from eeg_globals import *
-from signals_functions import *
+from .eeg_globals import *
+from .signals_functions import *
 
 user='Christian'
 
