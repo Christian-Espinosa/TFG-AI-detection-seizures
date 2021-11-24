@@ -25,8 +25,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .eeg_globals import *
-from .signals_functions import *
+from eeg_globals import *
+from signals_functions import *
 
 user='Christian'
 
@@ -53,7 +53,7 @@ elif user=='AuraCVC':
 elif user=='Christian':
     proj_dir = r'D:\UAB\4to'
     eeglib = os.path.join(proj_dir,'')
-    dataframes_dir = os.path.join(proj_dir,'DataSetTFG/CVC/dataframes')
+    dataframes_dir = os.path.join(proj_dir,'DataSetTFG/CVC/dataframes/')
     Data_dir= os.path.join(proj_dir,'DataSetTFG/CVC/parquet')
     OutPut_dir = os.path.join(proj_dir,'DataSetTFG/CVC/results')
     
@@ -141,8 +141,8 @@ print('reduced parquets saved ', eeg_df.shape) # (368186, 74)
 if chunk:
 
     filename = dataset + '_eeg_power.parquet'
-    eeg_df = pd.read_parquet(os.path.join(dataframes_dir,dataset,filename))
-    eeg_df['test'] = eeg_df['flight_number']
+    eeg_df = pd.read_parquet(os.path.abspath(os.path.join(dataframes_dir,filename)))
+    #eeg_df['test'] = eeg_df['flight_number']
     print('Step 1. Split data, parquet loaded', eeg_df.shape)    
     if 'simulator' in dataset:
         power_windows_datetime = cut_signal_simulator(eeg_df,dic_cut)
