@@ -22,8 +22,8 @@ start = timeit.default_timer()
 name_edf = "chb01_03"
 name_edf_seizures = "chb01_03"
 #file_name = os.path.abspath(os.getcwd() + "/Data/edf/" + name + ".edf")
-file_name = os.path.abspath("d:\\UAB\\4to\\TFG-AI-detection-seizures\\" + "Data/edf/" + name_edf + ".edf")
-path_parquet = os.path.abspath("d:\\UAB\\4to\\TFG-AI-detection-seizures\\" + "Data/parquet/" + name_edf + ".parquet")
+file_name = os.path.abspath("D:\UAB\4to\DataSetTFG" + "\CHB-MIT\edf" + name_edf + ".edf")
+path_parquet = os.path.abspath("D:\UAB\4to\DataSetTFG" + "\CHB-MIT\parquet" + name_edf + ".parquet")
 dic_band_definitions = { 'delta' : [0.5, 4],
                         'theta' : [4, 8],
                         'alpha' : [8, 12],
