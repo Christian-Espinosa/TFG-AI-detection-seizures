@@ -25,40 +25,28 @@ from library.CNN_models_vrs1 import *
 
 
 
-def main():
-    #-----------Configure Data Set-----------
-    path_chuncker = os.path.abspath("Code\\library\\MainScript_vrs1.py")
-    exec(open(path_chuncker).read())
+#-----------Configure Data Set-----------
+#path_chuncker = os.path.abspath("Code\\library\\MainScript_vrs1.py")
+#exec(open(path_chuncker).read())
 
-    #-----------Define Hyperparameters-----------
-    projmodule_params=None
+#-------------Open Data-------------
+pathtoChuncks = os.path.abspath("D:\\UAB\\4to\\DataSetTFG\\CVC\\dataframes\\cvc_eeg_power.parquet")
+x_test = pd.read_parquet(pathtoChuncks)
 
-    convnet_params={}
-    convnet_params['kernel_size']=(1,3)
-    convnet_params['Nneurons']=16
+#-----------Define Hyperparameters-----------
+projmodule_params=None
 
-    outputmodule_params={}
-    outputmodule_params['n_classes']=4
+convnet_params={}
+convnet_params['kernel_size']=(1,3)
+convnet_params['Nneurons']=16
 
-    model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params).cuda()
+outputmodule_params={}
+outputmodule_params['n_classes']=4
 
-    NSamp=10
-    n_channel=14
-    L=40
-    x_test=torch.randn(NSamp,n_channel,L)
-    model(x_test.cuda())
+#-----------Train-----------
+model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params).cuda()
 
-    NSamp=10
-    n_channel=1
-    L=40
-    x_test=torch.randn(NSamp,n_channel,L)
-    model(x_test.cuda())
+model(x_test.cuda())
 
-    NSamp=10
-    n_channel=14
-    L=60
-    x_test=torch.randn(NSamp,n_channel,L)
-    model(x_test.cuda())
+#-----------Test-----------
 
-if __name__ == '__main__':
-    main()
