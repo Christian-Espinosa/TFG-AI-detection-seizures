@@ -5,4 +5,4 @@ file_name = os.path.abspath("D:\\UAB\\4to\\DataSetTFG/CVC/dataframes/cvc_eeg_pow
 
 dic = pd.read_parquet(file_name)
 
-print(dic)
+print(dic.columns)

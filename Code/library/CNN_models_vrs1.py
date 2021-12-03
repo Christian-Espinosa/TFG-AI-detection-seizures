@@ -33,7 +33,7 @@ def ConVNet(n_features,ker_temp):
             # nn.Conv2d(n_features, n_features, kernel_size=ker_temp, padding=pad_temp),
             # nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
-            ).cuda()
+            )
 
    block2 = nn.Sequential(
             nn.Conv2d(n_features, 2 * n_features, kernel_size=ker_temp, padding=pad_temp),
@@ -47,7 +47,7 @@ def ConVNet(n_features,ker_temp):
             # nn.Conv2d(2 * n_features, 2 * n_features, kernel_size=ker_temp, padding=pad_temp),
             # nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
-            ).cuda()
+            )
 
    block3 = nn.Sequential(
             nn.Conv2d(2 * n_features, 4 * n_features, kernel_size=ker_temp, padding=pad_temp),
@@ -61,7 +61,7 @@ def ConVNet(n_features,ker_temp):
             # nn.Conv2d(4 * n_features, 4 * n_features, kernel_size=ker_temp, padding=pad_temp),
             # nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
-            ).cuda()
+            )
 
    return (block1,block2,block3)
 
@@ -156,12 +156,18 @@ class CNN_ConcatInput(nn.Module):
 
     def forward(self, x):
 
-        # input is (NSamp, NChannels, LSignal) 
+        # input is (NSamp, NChannels, LSignal)  ---> Datos unidimensionales, conv1D
+        # input is (NSamp, NChannels, Heiht, width)   ---> Datos Bidimensionales, conv2D                        
         # LSignal=L (1 dim); LSignal=(W,H) (2 dim); LSignal=(W,H,L)
 
         ## Input Signal Projection: Concatenation
+
+        #Definimos el batch size, los paquetes de datos
+        #Aplana los datos
+        #x=x.view(x.size(0), 1, 1, -1) #[N,NChannels*L]
+
         x=x.view(x.size(0), -1) #[N,NChannels*L]
-       
+        
         x = torch.unsqueeze(x, dim=1) # (N, 1, NChannels*L)
         #Trick to use conv2d operator instead of conv1
         x = torch.unsqueeze(x, dim=1) # (N, 1, 1,NChannels*L)  LSignal=(1,NChannels*L) 
@@ -602,7 +608,7 @@ class CNN_ProjChannel_v2(nn.Module):
             nn.Conv2d(1, 1, kernel_size=(1,n_inputs_loc[1])),
             nn.ReLU(inplace=True),
             nn.Dropout(0.1)
-            ).cuda()
+            )
         
         x= x.flatten(start_dim=2, end_dim=-1) # [N, NNeurons,L']
         x = torch.unsqueeze(x, dim=1)  # [N, 1,NNeurons,L']

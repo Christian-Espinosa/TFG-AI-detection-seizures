@@ -35,6 +35,18 @@ def Create_parquet_from_edf(name_edf, path_parquet=None):
     #Returns pandas table
     return df, dic
 
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
 def set_seizure_labeling(df, edf_f, path_parquet=None):
     #Data file
     n = edf_f.signals_in_file
@@ -51,24 +63,17 @@ def set_seizure_labeling(df, edf_f, path_parquet=None):
 
     #Returns pandas table
     return df
+
+def setLabels(dic, f):
+    dic['labels'] = np.zeros(len(dic[dic.keys()[-1]]))
+    name = f[-12:] #Get last part of string
+    name = name[:-4] #Delete .text
+    inFile = False
     
+    with open(f, 'r') as file:
+        for l in file:
+            if l == "File Name: " + name + "_" + n + ".edf":
+                inFile = True
 
-def butter_bandpass(lowcut, highcut, fs, order=5):
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
-    b, a = butter(order, [low, high], btype='band')
-    return b, a
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = lfilter(b, a, data)
-    return y
-
-    #schema = pa.schema({
-    #    "theta"  : pa.float64(),
-    #    "alpha" : pa.float64(),
-    #    "gamma" : pa.float64(),
-    #    "betah" : pa.float64(),
-    #    "betal" : pa.float64(),    
-    #})
+def saveToParquet(dic):
