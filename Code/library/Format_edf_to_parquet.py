@@ -64,16 +64,30 @@ def set_seizure_labeling(df, edf_f, path_parquet=None):
     #Returns pandas table
     return df
 
-def setLabels(dic, f):
-    dic['labels'] = np.zeros(len(dic[dic.keys()[-1]]))
+def setLabels(dic, f, hz=256):
+    #sets labels to a file
+    dic['labels'] = np.zeros(len(dic[dic.keys()[-1]], dtype=np.int4))
     name = f[-12:] #Get last part of string
-    name = name[:-4] #Delete .text
-    inFile = False
-    
+    name = name[:-4] #Delete .txt
+    n = 1
     with open(f, 'r') as file:
-        for l in file:
-            if l == "File Name: " + name + "_" + n + ".edf":
-                inFile = True
+        lines = file.readlines()
+    for i in range(len(lines)):
+        l = lines[i].strip()
+        if l == "File Name: " + name + "_" + "{:02.0f}".format(n) + ".edf":
+            i += 1
+            if lines[i].strip() == "Number of Seizures in File: 0":
+                return dic
+            elif lines[i].strip()[:-1] == "Number of Seizures in File: ":
+                for _ in range(int(lines[i].strip()[-1])):
+                    i += 1
+                    ini = int(l[i].strip()[:-8].replace('Seizure Start Time: ',''))*hz
+                    i += 1
+                    fi = int(l[i].strip()[:-8].replace('Seizure End Time: ',''))*hz
+                    for x in range(ini, fi):
+                        dic['labels'][x] = 1
+                return dic
+    return None
 
-
-def saveToParquet(dic):
+def saveToParquet(dic, path):
+    pd.DataFrame.from_dict(dic).to_parquet(path)

@@ -29,7 +29,7 @@ def Rawplot1Channel(dic, elec = "FP1-F7"):
     print('Time: ', stop - start)  
 
 def setBandwidth(dic, range, hz, elec = "FP1-F7"):
-
+    #sets bandwidth of all electrodes, prints one
     start = timeit.default_timer()
     print('{} to {} Plot'.format(range[0], range[1]))
     for k, v in dic.items():
@@ -52,7 +52,7 @@ def check_23electrodes(f, name, c):
         i=1
         find = False
         for l in file:
-            l = l.rstrip()
+            l = l.strip()
             
             if l == "Channel {}: {}".format(i, c[i-1]):
                 find = True
@@ -71,7 +71,7 @@ start = timeit.default_timer()
 name_edf = "chb01_03"
 summary = "chb01-summary"
 #Paths
-#file_name = os.path.abspath(os.getcwd() + "/Data/edf/" + name + ".edf")
+file_name = os.path.abspath(os.getcwd() + os.chdir("../DataSetTFG") + "/Data/edf/" + name + ".edf")
 file_name = os.path.abspath("D:\UAB\4to\DataSetTFG" + "\CHB-MIT\edf" + name_edf + ".edf")
 path_parquet = os.path.abspath("D:\UAB\4to\DataSetTFG" + "\CHB-MIT\parquet" + name_edf + ".parquet")
 file_summary = os.path.abspath("D:\UAB\4to\DataSetTFG" + "\CHB-MIT"+ summary + ".txt")
@@ -107,5 +107,8 @@ dic = setBandwidth(dic, dic_band_definitions[f_range], hz)
 # %%
 check_23electrodes(file_summary, summary, channels)
 dic = fra.setLabels(dic, file_summary)
+if dic == None:
+    print("Error in labeling!")
+
 fra.saveToParquet(dic)
 plt.show()
