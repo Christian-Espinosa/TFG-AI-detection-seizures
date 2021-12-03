@@ -70,7 +70,6 @@ start = timeit.default_timer()
 
 name_edf = "chb01_03"
 summary = "chb01-summary"
-
 #Paths
 #file_name = os.path.abspath(os.getcwd() + "/Data/edf/" + name + ".edf")
 file_name = os.path.abspath("D:\UAB\4to\DataSetTFG" + "\CHB-MIT\edf" + name_edf + ".edf")
@@ -107,6 +106,6 @@ dic = setBandwidth(dic, dic_band_definitions[f_range], hz)
 
 # %%
 check_23electrodes(file_summary, summary, channels)
-dic = fra.setLabels(dic, file_summary, name_edf)
+dic = fra.setLabels(dic, file_summary)
 fra.saveToParquet(dic)
 plt.show()
