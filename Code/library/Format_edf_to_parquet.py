@@ -46,7 +46,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
     y = lfilter(b, a, data)
     return y
-
+"""
 def set_seizure_labeling(df, edf_f, path_parquet=None):
     #Data file
     n = edf_f.signals_in_file
@@ -63,27 +63,28 @@ def set_seizure_labeling(df, edf_f, path_parquet=None):
 
     #Returns pandas table
     return df
+"""
+def setLabels(dic, f, n, hz=256):
+    #sets labels to a file using summary
+    #dic --> dictionary of the file
+    #f --> path to summary of the file
+    #hz --> hertz of samples
 
-def setLabels(dic, f, hz=256):
-    #sets labels to a file
-    dic['labels'] = np.zeros(len(dic[dic.keys()[-1]], dtype=np.int4))
-    name = f[-12:] #Get last part of string
-    name = name[:-4] #Delete .txt
-    n = 1
+    dic['labels'] = np.zeros(len(dic[list(dic.keys())[-1]]), dtype=np.int8)
+    name = f[-17:][:-12] #Get last part of string and delete .txt
     with open(f, 'r') as file:
         lines = file.readlines()
     for i in range(len(lines)):
-        l = lines[i].strip()
-        if l == "File Name: " + name + "_" + "{:02.0f}".format(n) + ".edf":
-            i += 1
+        if lines[i].strip() == "File Name: " + name + "_" + "{:02.0f}".format(n) + ".edf":
+            i += 3
             if lines[i].strip() == "Number of Seizures in File: 0":
                 return dic
             elif lines[i].strip()[:-1] == "Number of Seizures in File: ":
                 for _ in range(int(lines[i].strip()[-1])):
                     i += 1
-                    ini = int(l[i].strip()[:-8].replace('Seizure Start Time: ',''))*hz
+                    ini = int(lines[i].strip()[:-8].replace('Seizure Start Time: ',''))*hz
                     i += 1
-                    fi = int(l[i].strip()[:-8].replace('Seizure End Time: ',''))*hz
+                    fi = int(lines[i].strip()[:-8].replace('Seizure End Time: ',''))*hz
                     for x in range(ini, fi):
                         dic['labels'][x] = 1
                 return dic
