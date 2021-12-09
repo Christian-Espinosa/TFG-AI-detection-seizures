@@ -23,7 +23,33 @@ import torch.nn.functional as F
 from library.CNN_models_vrs1 import *
 #from eeg_util_data import * #---> What?
 
+def CheckModel(model):
 
+    print(model)
+    #Revisar que el model funciona correctament
+
+    NSamp=1
+    n_channel=2
+    L=4
+    x_test =torch.randn(NSamp,n_channel,L).cuda()
+    print("*********************")
+    print(x_test)
+    print(x_test.shape)
+    y = model(x_test)
+    print(y.shape)
+    print(y)
+
+    NSamp=10
+    n_channel=1
+    L=40
+    x_test=torch.randn(NSamp,n_channel,L)
+    model(x_test)
+
+    NSamp=10
+    n_channel=14
+    L=60
+    x_test=torch.randn(NSamp,n_channel,L)
+    model(x_test)
 
 #-----------Configure Data Set-----------
 #path_chuncker = os.path.abspath("Code\\library\\MainScript_vrs1.py")
@@ -43,36 +69,12 @@ convnet_params['Nneurons']=16
 outputmodule_params={}
 outputmodule_params['n_classes']=4
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 #-----------Train-----------
-model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params)
-
-print(model)
-#Revisar que el model funciona correctament
-
-NSamp=1
-n_channel=2
-L=4
-x_test =torch.randn(NSamp,n_channel,L)
-print(x_test)
-print(x_test.shape)
-y = model(x_test)
-print(y.shape)
-print(y)
-"""
-NSamp=10
-n_channel=1
-L=40
-x_test=torch.randn(NSamp,n_channel,L)
-model(x_test)
-
-NSamp=10
-n_channel=14
-L=60
-x_test=torch.randn(NSamp,n_channel,L)
-model(x_test)
+model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params).cuda()
+CheckModel(model)
 
 #-----------Split DB-----------
 #leave one out -> test con uno
 #procentaje dividir
 #por cada sujeto trein y test
-"""
