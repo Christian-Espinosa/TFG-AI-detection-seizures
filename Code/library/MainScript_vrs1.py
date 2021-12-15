@@ -51,11 +51,12 @@ elif user=='AuraCVC':
     OutPut_dir = os.path.join(proj_dir,'results')
 
 elif user=='Christian':
-    proj_dir = r'D:\UAB\4to'
+    subj = 'chb01/'
+    proj_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj)
     eeglib = os.path.join(proj_dir,'')
-    dataframes_dir = os.path.join(proj_dir,'DataSetTFG/CVC/dataframes/')
-    Data_dir= os.path.join(proj_dir,'DataSetTFG/CVC/parquet')
-    OutPut_dir = os.path.join(proj_dir,'DataSetTFG/CVC/results')
+    dataframes_dir = os.path.join(proj_dir,'parquet')
+    Data_dir= os.path.join(proj_dir,'parquet')
+    OutPut_dir = os.path.join(proj_dir,'p_slice')
     
 else:
     proj_dir = r'C:\Users\aura.CVC\OneDrive - Universitat Autònoma de Barcelona\ePilots\ML2'

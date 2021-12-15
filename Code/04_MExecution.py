@@ -69,12 +69,36 @@ convnet_params['Nneurons']=16
 outputmodule_params={}
 outputmodule_params['n_classes']=4
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#CUDA
+use_cuda = torch.cuda.is_available()
+device = torch.device("cuda:0" if use_cuda else "cpu")
+torch.backends.cudnn.benchmark = True
+
+
+
 #-----------Train-----------
 model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params).cuda()
-CheckModel(model)
+#CheckModel(model)
 
 #-----------Split DB-----------
+labels = ["FP1-F7","F7-T7","T7-P7","P7-O1","FP1-F3","F3-C3","C3-P3","P3-O1","FP2-F4","F4-C4","C4-P4","P4-O2","FP2-F8","F8-T8","T8-P8","P8-O2","FZ-CZ","CZ-PZ","P7-T7","T7-FT9","FT9-FT10","FT10-T8","T8-P8"]
+
+# Parameters
+params = {'batch_size': 64,
+          'shuffle': True,
+          'num_workers': 6}
+max_epochs = 100
+
+
 #leave one out -> test con uno
 #procentaje dividir
 #por cada sujeto trein y test
+subj = 'chb01'
+parquets = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/parquet/')
+for name in os.listdir(parquets):
+    p_ds = pd.read_parquet(parquets + '/' + name)
+    ds_lb = p_ds['labels']
+    ds_val = p_ds.drop('labels', axis=1)
+
+    #split dataset amb els labels dintre X Y
+    #
