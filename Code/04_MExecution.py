@@ -22,34 +22,9 @@ import torch.nn.functional as F
 #Based on Check_ModelsArchitecture_Script
 from library.CNN_models_vrs1 import *
 #from eeg_util_data import * #---> What?
+import library.Dataset_Functions as dat
 
-def CheckModel(model):
 
-    print(model)
-    #Revisar que el model funciona correctament
-
-    NSamp=1
-    n_channel=2
-    L=4
-    x_test =torch.randn(NSamp,n_channel,L).cuda()
-    print("*********************")
-    print(x_test)
-    print(x_test.shape)
-    y = model(x_test)
-    print(y.shape)
-    print(y)
-
-    NSamp=10
-    n_channel=1
-    L=40
-    x_test=torch.randn(NSamp,n_channel,L)
-    model(x_test)
-
-    NSamp=10
-    n_channel=14
-    L=60
-    x_test=torch.randn(NSamp,n_channel,L)
-    model(x_test)
 
 #-----------Configure Data Set-----------
 #path_chuncker = os.path.abspath("Code\\library\\MainScript_vrs1.py")
@@ -76,29 +51,37 @@ torch.backends.cudnn.benchmark = True
 
 
 
-#-----------Train-----------
-model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params).cuda()
-#CheckModel(model)
-
-#-----------Split DB-----------
-labels = ["FP1-F7","F7-T7","T7-P7","P7-O1","FP1-F3","F3-C3","C3-P3","P3-O1","FP2-F4","F4-C4","C4-P4","P4-O2","FP2-F8","F8-T8","T8-P8","P8-O2","FZ-CZ","CZ-PZ","P7-T7","T7-FT9","FT9-FT10","FT10-T8","T8-P8"]
-
 # Parameters
 params = {'batch_size': 64,
           'shuffle': True,
-          'num_workers': 6}
-max_epochs = 100
-
-
-#leave one out -> test con uno
-#procentaje dividir
-#por cada sujeto trein y test
+          'num_workers': 6,
+          'n_epochs': 100}
+criterion = nn.CrossEntropyLoss()
+model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params)
+optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4, momentum = 0.9)
 subj = 'chb01'
+
+#dat.CheckModel(model)
+
 parquets = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/parquet/')
 for name in os.listdir(parquets):
     p_ds = pd.read_parquet(parquets + '/' + name)
-    ds_lb = p_ds['labels']
-    ds_val = p_ds.drop('labels', axis=1)
 
-    #split dataset amb els labels dintre X Y
-    #
+    train, test =  dat.SplitData(p_ds, 0.01)
+    #Validation?
+
+    #Train
+    train_dataloader = torch.utils.data.DataLoader(train, batch_size=params["batch_size"], shuffle=params["shuffle"])
+
+    model, avg_cost = dat.train_model(model,
+                                    optimizer,
+                                    criterion,
+                                    train_dataloader,
+                                    valid_dataloader = None,
+                                    batch_size=params["n_epochs"],
+                                    verbose=0,
+                                    save_path= parquets + '/model.pt')
+
+    
+    #Test
+    test_dataloader = torch.utils.data.DataLoader(test.loc[:, train.columns != 'b'], batch_size=params["batch_size"], shuffle=params["shuffle"])
