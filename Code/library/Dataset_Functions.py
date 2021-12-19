@@ -43,9 +43,7 @@ def SplitData(data, perc):
     test = data[n_tr:]
     return train, test
 
-def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
-                n_epochs, verbose=1, save_path='./pretrained/model.pt',
-                best_val_loss=None):
+def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader, n_epochs):
 
     # Training the model for TOTAL_EPOCHS
     total_train_batch = len(train_dataloader)
@@ -79,3 +77,29 @@ def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
                     loss = criterion(outputs, targets)
 
     return model
+
+def test_model(model, test_dataloader):
+
+    total_test_batch = len(test_dataloader)
+
+    y_true = []
+    y_pred = []
+    y_pred_probs = []
+    model.eval()
+    with torch.no_grad():
+        iter_test_dataset = iter(test_dataloader)
+        for k in range(total_test_batch):
+            seqs, targets = next(iter_test_dataset)
+            seqs, targets = seqs.cuda(), targets.cuda()
+            print("seqs: ",seqs)
+            outputs, probs = model(seqs)
+            pred = outputs.max(1, keepdim=True)[1].cpu().numpy()
+
+            y_pred.extend(list(pred.reshape(-1,)))
+            y_pred_probs.append(probs.cpu().numpy())
+            y_true.extend(list(targets.cpu().numpy()))
+
+    y_pred_probs = np.concatenate(y_pred_probs, axis=0)
+    y_pred_probs = np.round(y_pred_probs, 2)
+
+    return (y_true, y_pred), y_pred_probs
