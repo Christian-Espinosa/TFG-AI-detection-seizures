@@ -11,7 +11,7 @@
 \usepackage[top=2cm, bottom=1.5cm, left=2cm, right=2cm]{geometry}
 \usepackage[figurename=Fig.,tablename=TAULA]{caption}
 
-\usepackage[style=verbose, backend=biber]{biblatex}
+\usepackage{biblatex}
 \addbibresource{ref.bib}
 
 \captionsetup[table]{textfont=sc}
@@ -84,7 +84,7 @@
 \textbf{Abstract--}An electroencephalogram (EEG) is a test that detects electrical activity of the brain. Since 
 1924 this procedure has been done countless times to obtain brain activity. This paper tries to go a step further 
 to understand electroencephalography better using deep learning algorithms. The data used in this paper is a public 
-dataset CHB-MIT of recordings of paediatric subjects with intractable seizures. Different methods of data management 
+dataset CHB-MIT\cite{goldberger2000physiobank} of recordings of paediatric subjects with intractable seizures. Different methods of data management 
 are done and documented to make the most of the algorithms used. The objective is to train an algorithm to acknowledge 
 when the subject is having a seizure.
 \\
@@ -115,14 +115,14 @@ when the subject is having a seizure.
 \\
 Neural oscillations are rhythmic or repetitive patterns of neural activity in the central nervous system which can be driven by mechanisms within individual neurons or by interactions. Since 1824 neural oscillations have been observed, fifty years later intrinsic oscillatory behaviour was encountered in vertebrate neurons, but the purpose of these is yet to be fully understood.
 \\
-In order to understand better brain activity in this TFG tries to dig deeper using new technology like deep learning to try to understand what humans are incapable of doing. First of all, it will be needed an inside view on how the brain works to have a hint on how to extract or intercept information from the neurons to process externally in a computer as well as a view on how deep learning algorithm’s function and get results from data, because it’s the best way to process and get the most out of it. Afterwards an insight of previous papers is given to set a view point on how research has been made up until this point. A well-known database (CHB-MIT) is introduced of encephalograms collected from 23 subject with interactable seizures that has been used in previous research.
+In order to understand better brain activity in this TFG tries to dig deeper using new technology like deep learning to try to understand what humans are incapable of doing. First of all, it will be needed an inside view on how the brain works to have a hint on how to extract or intercept information from the neurons to process externally in a computer as well as a view on how deep learning algorithm’s function and get results from data, because it’s the best way to process and get the most out of it. Afterwards an insight of previous papers is given to set a view point on how research has been made up until this point. A well-known database (CHB-MIT)\cite{goldberger2000physiobank} is introduced of encephalograms collected from 23 subject with interactable seizures that has been used in previous research.
 \\
 Once everything is acknowledged objectives of in this TFG are settled for further research on this issue. First of all, data planning and different treatment procedures are important to see how algorithms behave giving better or worse results, as well as which algorithm architectures are better to process EEG data. Finally, once all the research is done the classifier is to be expected to classify moments where seizures occur on the patients in a given moment.
 \\
 
 \subsection{Dataset}
 \leavevmode\\
-The dataset is data collected from the Children’s Hospital Boston, consisting in EEG recordings of subjects with intractable seizures. The folders classify in 23 cases from 22 subjects (case chb21 and chb1 are the same but 1.5 years apart). The subject’s personal information gender and age is in a separate file called SUBJECT-INFO added in this paper as subject\_info.csv.
+The dataset\cite{goldberger2000physiobank} is data collected from the Children’s Hospital Boston, consisting in EEG recordings of subjects with intractable seizures. The folders classify in 23 cases from 22 subjects (case chb21 and chb1 are the same but 1.5 years apart). The subject’s personal information gender and age is in a separate file called SUBJECT-INFO added in this paper as subject\_info.csv.
 \\
 Each case contains between 9 and 42 .edf files. There are .edf files of EEG signals without seizures and others with recordings of seizures, these defined in RECORDS-WITH-SEIZURES. The files with seizures have the extension .edf.seizures which disables the possibility of accessing the file with a normal edf reader library.
 \\
@@ -139,7 +139,7 @@ There are two main objectives in this TFG. The first objective is to find the be
 To fulfil the objectives is crucial to define smaller objectives to make work easier. Within the first objective there are several important parts. 
 \\
 \begin{itemize}
-  \item Raw data must be readable, as the data base CHB-MIT is in European Data Format (EDF), a standard file format designed for exchange and storage of medical time series, so all files in the dataset are “.edf”. A script has been programmed to save .edf files into .parquet format.
+  \item Raw data must be readable, as the data base CHB-MIT\cite{goldberger2000physiobank} is in European Data Format (EDF), a standard file format designed for exchange and storage of medical time series, so all files in the dataset are “.edf”. A script has been programmed to save .edf files into .parquet format.
   \item Setting different functions to filter data making sure data is okey and fits certain constraints. 
   \item Get the labelling data, to have a ground truth from the recorded data. This part is essential to understand if the model works as expected.
   \item Define different functions to define how data enters the model to be trained. There are many ways information can be extracted from data. 
@@ -178,9 +178,15 @@ The script will automatically label all raw data using the summary file in each 
 \\
 Filtering data is done by first setting a maximum range from 0.5hz to 50hz, and afterwards only by changing the name of a parameter it can be changed to delta, theta, alpha, beta or gamma’s range frequencies in a dictionary added by default. Everything is modular so it can be changed any time with any range of frequencies. All data is saved in “.parquet” format in a different folder named parquets in every subject’s folder, if plotting is enabled it will plot each subject’s data.
 \\
+\\
 After all desired raw data is filtered and saved, the second script to execute is “04\_MExecution.py”, this one is in charge of the execution of the model to obtain the results classifying the data. All hyperparameters are defined at the beginning of the script, and afterword’s the module is tested with random data to ensure it’s working as expected. For each parquet it splits it’s content depending of the percentage settled in training and testing, continuing by training the model and testing.
+\\
 
-
+\begin{figure}[h]
+  \caption{Scheme of data processing }
+  \centering
+  \includegraphics[width=0.5\textwidth]{img/FeatureProjectorModel.png}
+  \end{figure}
 
 \input{Annex.tex}
 
