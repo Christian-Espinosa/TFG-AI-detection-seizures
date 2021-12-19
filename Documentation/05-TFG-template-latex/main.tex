@@ -10,6 +10,10 @@
 \usepackage{lettrine}
 \usepackage[top=2cm, bottom=1.5cm, left=2cm, right=2cm]{geometry}
 \usepackage[figurename=Fig.,tablename=TAULA]{caption}
+
+\usepackage[style=verbose, backend=biber]{biblatex}
+\addbibresource{ref.bib}
+
 \captionsetup[table]{textfont=sc}
 
 \author{\LARGE\sffamily Christian Espinosa Reboredo}
@@ -30,7 +34,7 @@
 {\textbf{\thesection}}{1em}{}
 
 \begin{document}
-
+\nocite{*}
 \fancyhead[LO]{\scriptsize AUTOR: TÍTOL DEL TREBALL}
 \fancyhead[RO]{\thepage}
 \fancyhead[LE]{\thepage}
@@ -116,22 +120,39 @@ In order to understand better brain activity in this TFG tries to dig deeper usi
 Once everything is acknowledged objectives of in this TFG are settled for further research on this issue. First of all, data planning and different treatment procedures are important to see how algorithms behave giving better or worse results, as well as which algorithm architectures are better to process EEG data. Finally, once all the research is done the classifier is to be expected to classify moments where seizures occur on the patients in a given moment.
 \\
 
+\subsection{Dataset}
+\leavevmode\\
+The dataset is data collected from the Children’s Hospital Boston, consisting in EEG recordings of subjects with intractable seizures. The folders classify in 23 cases from 22 subjects (case chb21 and chb1 are the same but 1.5 years apart). The subject’s personal information gender and age is in a separate file called SUBJECT-INFO added in this paper as subject\_info.csv.
+\\
+Each case contains between 9 and 42 .edf files. There are .edf files of EEG signals without seizures and others with recordings of seizures, these defined in RECORDS-WITH-SEIZURES. The files with seizures have the extension .edf.seizures which disables the possibility of accessing the file with a normal edf reader library.
+\\
+Most cases have 1 hour of EEG recordings, but some have 1 to 4 hours depending on the case, split between 9 to 42 edf recordings, recorded at 256Hz in 16 bit resolution.
+\\
 
 \input{related_work.tex}
 
 
 \section{Objectives}
 \label{sec-objectives}
-There are two main objectives in this TFG. The first objective is to find the best way to treat, analyse and classify data before feeding it to the deep learning algorithms, for example, as a continuous stream of sequence, dividing data per subject…  or trying different test/train strategies such as leave one out, 50/50… The second main objective is to try to find which algorithms architectures have better results with the data, for example CNN, Transformer, SVM.
+There are two main objectives in this TFG. The first objective is to find the best way to treat and analyse before feeding it to the deep learning algorithms. For example, as a continuous stream of sequence, dividing data per subject…  Or trying different test/train strategies such as leave one out, 50/50… The second main objective is to try to find which algorithms architectures have better results. There are different models offered by the research group IAM from the CVC.
 \\
-To fulfil the objectives is crucial to define smaller objectives to make work easier. Within the first objectives there are several important parts. First of all, raw data must be readable, as the data base CHB-MIT is in European Data Format (EDF), a standard file format designed for exchange and storage of medical time series, so all files in the dataset are “.edf” or “.edf.seizures”. This last format can be a problem for most common edf readers because of its “.seizures” extension, so further programs will be needed to obtain the data from these files.
+To fulfil the objectives is crucial to define smaller objectives to make work easier. Within the first objective there are several important parts. 
 \\
-The next objective after obtaining data, is to save the raw data in “.parquet”, because it’s the type of format needed as input in the models lend by the CVC research group. In this stage data filtering should be considered as well as being able to plot data if needed. The next file to read the data is MainSource\_vr1.py, has options of filtering or splitting data to prepare data before entering the models. 
+\begin{itemize}
+  \item Raw data must be readable, as the data base CHB-MIT is in European Data Format (EDF), a standard file format designed for exchange and storage of medical time series, so all files in the dataset are “.edf”. A script has been programmed to save .edf files into .parquet format.
+  \item Setting different functions to filter data making sure data is okey and fits certain constraints. 
+  \item Get the labelling data, to have a ground truth from the recorded data. This part is essential to understand if the model works as expected.
+  \item Define different functions to define how data enters the model to be trained. There are many ways information can be extracted from data. 
+\end{itemize}
+\leavevmode\\
+The next objective after obtaining data is to use different models provided by the research group to IAM:
 \\
-Once the data if finally ready to be used the next main objective is to define the way data is going to be treated to get the best results. There are different models depending on the dimensions of the data input, and so different tactics of data treatment are done. In this objective the idea is to obtain the different outputs and plot the data for further investigation.
-\\
-Finally, a final review of the results is done to determine the best way to treat EEG signals and what models preform better in different circumstances. So, the program needs to be executed in many different ways to have a large view and a better understanding on how to process and classify EEG signals.
-\\
+\begin{itemize}
+  \item Each model needs to be configured to accept the dimensionality of the data fed to it.
+  \item Work different models to choose what models give better answers form input data.
+  \item After all the models results, an overview is done to understand the results and conclude the best way to treat this database, for further investigation.
+\end{itemize}
+\leavevmode\\
 
 \section{Tasks}
 \label{sec-tasks}
@@ -144,34 +165,21 @@ To start from somewhere the first task will be to use an already done deep learn
 \leavevmode\\
 This framework was originally intended to study brain workload, so, within this framework, the idea is to modify it to fulfil the objective of clinic seizure detection. In this TFG, different strategies will be applied on the input data of the algorithm to further study it’s capabilities.
 \\
-If this itself it’s already done within the period of completion of this research and there is still time for more tasks, a new neural network will be created. A deep search on what architectures there are, and which suits better for this work will be done and a new model will be created from scratch. Afterword the models will be compared and reported to learn which preform better in different conditions.
+Because in this TFG the CHB-MIT Scalp EEG Database is being used and all files are in format “.edf” a first script has been needed to change the format from “.edf” to “.parquet”. This script is called “03\_ReadEDF.py”, being the first script to execute this TFG. It’s designed to extract the files from a specific folder hierarchy where all the encephalograms are classified by subjects. For simplicity this script obtains, filters, plots, and saves in parquets all input data. Datasets provided by the cvc have also been used, but the scripts used to read, filter and split data is “MainSource\_vr1.py”.
 \\
-Diferent tasks to be done:
-\begin{figure}[!h]
-  \centering
-    \includegraphics[width=0.4\textwidth]{img/Tasks.png}
-    \caption{General Tasks of the TFG}
-    \label{fig-exemple}
-  \end{figure}
-
-Note that “Write Work Reaserch” tasks are before every meeting.
+In the “03\_ReadEDF.py” script there are different options on how raw data is imported, and also there are options on the way to execute them. Because during the development of this TFG many tests have been done, there are two different ways to execute the script:
+\\
+\begin{itemize}
+  \item Single execution, where the subject number and the edf file of the subject needs to be provided to execute the script for this single file. 
+  \item Multiple executions, where the number of subjects is provided. The script will go though all the first n subjects defined.
+\end{itemize}
 \leavevmode\\
+The script will automatically label all raw data using the summary file in each subject’s folder, so it’s important for it to be present or a label execution error will pop up. The files “.edf.seizures” in every subject’s folder were unreadable, even reading the binary was a failure. The script will make sure the file has all the data from the desired electrodes, this is important because hardware problems while recording the edfs some files have gaps or lack some data, if any edf file have this problem it will automatically be excluded and the user will be notified.
+\\
+Filtering data is done by first setting a maximum range from 0.5hz to 50hz, and afterwards only by changing the name of a parameter it can be changed to delta, theta, alpha, beta or gamma’s range frequencies in a dictionary added by default. Everything is modular so it can be changed any time with any range of frequencies. All data is saved in “.parquet” format in a different folder named parquets in every subject’s folder, if plotting is enabled it will plot each subject’s data.
+\\
+After all desired raw data is filtered and saved, the second script to execute is “04\_MExecution.py”, this one is in charge of the execution of the model to obtain the results classifying the data. All hyperparameters are defined at the beginning of the script, and afterword’s the module is tested with random data to ensure it’s working as expected. For each parquet it splits it’s content depending of the percentage settled in training and testing, continuing by training the model and testing.
 
-\begin{figure*}[!h]
-  \centering
-    \includegraphics[width=1\textwidth]{img/Gantt.png}
-    \caption{Gantt Diagram of the project}
-    \label{fig-exemple}
-  \end{figure*}
-
-\subsection{Dataset}
-\leavevmode\\
-The dataset is data collected from the Children’s Hospital Boston, consisting in EEG recordings of subjects with intractable seizures. The folders classify in 23 cases from 22 subjects (case chb21 and chb1 are the same but 1.5 years apart). The subject’s personal information gender and age is in a separate file called SUBJECT-INFO added in this paper as subject\_info.csv.
-\\
-Each case contains between 9 and 42 .edf files. There are .edf files of EEG signals without seizures and others with recordings of seizures, these defined in RECORDS-WITH-SEIZURES. The files with seizures have the extension .edf.seizures which disables the possibility of accessing the file with a normal edf reader library.
-\\
-Most cases have 1 hour of EEG recordings, but some have 1 to 4 hours depending on the case, split between 9 to 42 edf recordings, recorded at 256Hz in 16 bit resolution.
-\\
 
 
 \input{Annex.tex}
@@ -179,33 +187,11 @@ Most cases have 1 hour of EEG recordings, but some have 1 to 4 hours depending o
 
 \section{Bibliography}
 \label{sec-bibliography}
-\include{ref.bib}
+
+\printbibliography
 
 %\section*{Agraïments}
 
-%\begin{thebibliography}{11}
-
-%\bibitem{neural_oscilation}
-%https://en.wikipedia.org/wiki/Neural\_oscillation
-
-%\bibitem{seizure}
-%https://en.wikipedia.org/wiki/Seizure
-
-%\bibitem{latex}
-%http://en.wikibooks.org/wiki/LaTeX
-
-%\bibitem{the}
-%http://www.acnweb.org/acta/2002\_18\_2\_104.pdf
-
-%\bibitem{other projects}
-%https://arxiv.org/pdf/1908.10432v1.pdf
-
-%\bibitem{dataset}
-%https://paperswithcode.com/dataset/chb-mit
-
-
-
-%\end{thebibliography}
 
 \end{document}
 
