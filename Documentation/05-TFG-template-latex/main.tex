@@ -165,7 +165,7 @@ To start from somewhere the first task will be to use an already done deep learn
 \leavevmode\\
 This framework was originally intended to study brain workload, so, within this framework, the idea is to modify it to fulfil the objective of clinic seizure detection. In this TFG, different strategies will be applied on the input data of the algorithm to further study it’s capabilities.
 \\
-Because in this TFG the CHB-MIT Scalp EEG Database is being used and all files are in format “.edf” a first script has been needed to change the format from “.edf” to “.parquet”. This script is called “03\_ReadEDF.py”, being the first script to execute this TFG. It’s designed to extract the files from a specific folder hierarchy where all the encephalograms are classified by subjects. For simplicity this script obtains, filters, plots, and saves in parquets all input data. Datasets provided by the cvc have also been used, but the scripts used to read, filter and split data is “MainSource\_vr1.py”.
+Because in this TFG the CHB-MIT Scalp EEG Database\cite{goldberger2000physiobank} is being used and all files are in format “.edf” a first script has been needed to change the format from “.edf” to “.parquet”. This script is called “03\_ReadEDF.py”, being the first script to execute this TFG. It’s designed to extract the files from a specific folder hierarchy where all the encephalograms are classified by subjects. For simplicity this script obtains, filters, plots, and saves in parquets all input data. Datasets provided by the cvc have also been used, but the scripts used to read, filter and split data is “MainSource\_vr1.py”.
 \\
 In the “03\_ReadEDF.py” script there are different options on how raw data is imported, and also there are options on the way to execute them. Because during the development of this TFG many tests have been done, there are two different ways to execute the script:
 \\
@@ -186,8 +186,10 @@ After all desired raw data is filtered and saved, the second script to execute i
   \caption{Scheme of data processing }
   \centering
   \includegraphics[width=0.5\textwidth]{img/FeatureProjectorModel.png}
-  \end{figure}
-
+\end{figure}
+\leavevmode\\
+During the implementation of this procedure, a lot of problems of dependency on critical libraries has happened. Starting by cuda, for faster results it is used in all models, but it might not work if the architecture of the graphics card is too old. It is also not compatible with python 3.10 which was the version being worked on at the moment, it had to be switched to an environment with python 3.8 to avoid further issues.
+\\
 \input{Annex.tex}
 
 
