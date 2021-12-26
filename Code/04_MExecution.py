@@ -92,11 +92,9 @@ for name in os.listdir(parquets):
     test_dataloader = torch.utils.data.DataLoader(test.loc[:, train.columns != 'b'], batch_size=params["batch_size"], shuffle=params["shuffle"])
 
     y_true, y_pred, y_prob = dat.test_model(model, test_dataloader)
-    report = metrics.classification_report(y_true, y_pred, labels=tags_label,
-                                            target_names=tags_categ,
-                                            zero_division=0, output_dict=True)
-
-
+    report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
+    print(report)
+"""
 if save_model:
 
     pth_dir = os.path.join(OutPut_Dir, 'pretrained', MODEL_NAME)
@@ -107,3 +105,4 @@ if save_model:
             '_lr_' + '{:.0e}'.format(TRAIN_CONFIG['lr']) + '_exp_' + EXP_TYPE + '.pth'
     pth_file = os.path.join(pth_dir, pth_file)
     save_checkpoint(model, optimizer, np.Inf, TRAIN_CONFIG['n_epochs'], pth_file)
+    """
