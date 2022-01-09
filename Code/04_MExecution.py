@@ -39,10 +39,10 @@ projmodule_params=None
 
 convnet_params={}
 convnet_params['kernel_size']=(1,3)
-convnet_params['Nneurons']=16
+convnet_params['Nneurons']=64
 
 outputmodule_params={}
-outputmodule_params['n_classes']=4
+outputmodule_params['n_classes']=2
 
 #CUDA
 use_cuda = torch.cuda.is_available()
@@ -52,40 +52,32 @@ torch.backends.cudnn.benchmark = True
 
 
 # Parameters
-params = {'batch_size': 64,
-          'shuffle': True,
+params = {'batch_size': 750,
+          'shuffle': False,
           'num_workers': 6,
           'n_epochs': 100}
 criterion = nn.CrossEntropyLoss()
 model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params)
-optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4, momentum = 0.9)
+optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4)
 subj = 'chb01'
 
 #dat.CheckModel(model)
 
 parquets = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/parquet/')
-save_model = os.path.abspath()
+save_model = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj)
 for name in os.listdir(parquets):
     p_ds = pd.read_parquet(parquets + '/' + name)
-
+    print(p_ds[0:30 ])
     # 1) data normalization
-    data, scalers = scalers_fit(p_ds)
-    data = scalers_transform(scalers, data)
+    #data, scalers = scalers_fit(p_ds)
+    #data = scalers_transform(scalers, data)
 
-    train, test =  dat.SplitData(data, 0.01)
+    train, test =  dat.SplitData(p_ds, 0.01)
     #Validation?
 
     #Train
     train_dataloader = torch.utils.data.DataLoader(train, batch_size=params["batch_size"], shuffle=params["shuffle"])
-
-    model, avg_cost = dat.train_model(model,
-                                    optimizer,
-                                    criterion,
-                                    train_dataloader,
-                                    valid_dataloader = None,
-                                    batch_size=params["n_epochs"],
-                                    verbose=0,
-                                    save_path= parquets + '/model.pt')
+    model, avg_cost = dat.train_model(model, optimizer, criterion, train_dataloader)
 
 
     #Test

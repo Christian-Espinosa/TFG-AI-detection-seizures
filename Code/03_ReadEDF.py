@@ -85,7 +85,7 @@ channels = ["FP1-F7","F7-T7","T7-P7","P7-O1","FP1-F3","F3-C3","C3-P3","P3-O1","F
 if single_execution:
     #%%
     n_subj = 1
-    file = 3
+    file = 4
     show_plots = True
 
     name_edf = "chb{:02.0f}_{:02.0f}".format(n_subj, file)

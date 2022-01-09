@@ -35,19 +35,22 @@ def CheckModel(model):
     x_test=torch.randn(NSamp,n_channel,L)
     model(x_test)
 
-def SplitData(data, perc):
+def SplitData(data, perc, labeloffirstelement = 'FP1-F7'):
     #define percentage of train
-    rows = len(data[0])
+    rows = len(data[labeloffirstelement])
     n_tr = int(math.floor(rows*perc))
-    train = data.head(n_tr)
-    test = data[n_tr:]
+    train = data.iloc[:n_tr]
+    test = data.iloc[n_tr:]
     return train, test
 
-def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader, n_epochs):
+def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
+                n_epochs, verbose=1):
 
     # Training the model for TOTAL_EPOCHS
     total_train_batch = len(train_dataloader)
     for epoch in range(n_epochs):
+        index = epoch
+        cost = np.zeros(6, dtype=np.float32)
 
         # training
         model.train()
@@ -63,20 +66,24 @@ def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
             loss.backward()
             optimizer.step()
 
-        # validation
-        if valid_dataloader is not None:
-            total_valid_batch = len(valid_dataloader)
-            model.eval()
-            with torch.no_grad():
-                iter_valid_dataset = iter(valid_dataloader)
-                for k in range(total_valid_batch):
-                    seqs, targets = next(iter_valid_dataset)
-                    seqs, targets = seqs.cuda(), targets.cuda()
-                    # outputs = model(seqs)
-                    outputs, _ = model(seqs) # returned second value is probs
-                    loss = criterion(outputs, targets)
-
-    return model
+            cost[0] = loss.item()
+            cost[1], cost[2], _ = compute_metrics(outputs, targets)
+            avg_cost[index, :3] += cost[ :3] / total_train_batch
+"""
+    # validation
+    if valid_dataloader is not None:
+        total_valid_batch = len(valid_dataloader)
+        model.eval()
+        with torch.no_grad():
+            iter_valid_dataset = iter(valid_dataloader)
+            for k in range(total_valid_batch):
+                seqs, targets = next(iter_valid_dataset)
+                seqs, targets = seqs.cuda(), targets.cuda()
+                # outputs = model(seqs)
+                outputs, _ = model(seqs) # returned second value is probs
+                loss = criterion(outputs, targets)
+"""
+    
 
 def test_model(model, test_dataloader):
 
