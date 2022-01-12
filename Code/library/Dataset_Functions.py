@@ -7,33 +7,23 @@ import torch
 import pandas as pd
 import pyarrow.parquet as pq
 
-def CheckModel(model):
+def CheckModel(model, device):
 
+    model.to(device)
     print(model)
     #Revisar que el model funciona correctament
 
-    NSamp=1
-    n_channel=2
-    L=4
-    x_test =torch.randn(NSamp,n_channel,L).cuda()
+    n_window=4
+    n_channel=22
+    L=40*256
+    x_test =torch.randn(n_window,n_channel,L).to(device)
     print("*********************")
-    print(x_test)
-    print(x_test.shape)
+    #print(x_test)
+    #print(x_test.shape)
     y = model(x_test)
     print(y.shape)
     print(y)
 
-    NSamp=10
-    n_channel=1
-    L=40
-    x_test=torch.randn(NSamp,n_channel,L)
-    model(x_test)
-
-    NSamp=10
-    n_channel=14
-    L=60
-    x_test=torch.randn(NSamp,n_channel,L)
-    model(x_test)
 
 def SplitData(data, perc, labeloffirstelement = 'FP1-F7'):
     #define percentage of train

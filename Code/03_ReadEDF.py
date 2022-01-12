@@ -80,7 +80,8 @@ dic_band_definitions = { 'delta' : [0.5, 4],
                         'maxrange' : [0.5, 50]}
 #23 channels
 channels = ["FP1-F7","F7-T7","T7-P7","P7-O1","FP1-F3","F3-C3","C3-P3","P3-O1","FP2-F4","F4-C4","C4-P4","P4-O2","FP2-F8","F8-T8","T8-P8","P8-O2","FZ-CZ","CZ-PZ","P7-T7","T7-FT9","FT9-FT10","FT10-T8","T8-P8"]
-
+dic_cut = {'window' : 40, # window size seconds
+                'overlap' : 0} # overlapping seconds
 
 if single_execution:
     #%%
@@ -94,6 +95,7 @@ if single_execution:
     #Paths
     file_name = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf/" + name_edf + ".edf")
     path_parquet = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/parquet/" + name_edf + ".parquet")
+    path_numpy = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/parquet/" + name_edf)    
     file_summary = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/" + summary + ".txt")
 
     #%%
@@ -121,6 +123,9 @@ if single_execution:
         print("Error in labeling!")
 
     fra.saveToParquet(dic, path_parquet)
+    fra.chunkData(path_parquet, dic_cut)
+    fra.saveToNumpy(path_parquet, path_numpy)
+    
     if show_plots:
         plt.show()
     stop = timeit.default_timer()
@@ -145,6 +150,7 @@ else:
                 #name_edf = elem[j][:-4]
                 file_name = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf/" + name_edf + ".edf")
                 path_parquet = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/chb01/parquet/" + name_edf + ".parquet")
+                path_numpy = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/parquet/" + name_edf)
                 file_summary = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + summary + ".txt")
                 
                 edf_f = pyedflib.EdfReader(file_name)
@@ -159,6 +165,9 @@ else:
                     print("Error in labeling!")
 
                 fra.saveToParquet(dic, path_parquet)
+                fra.chunkData(path_parquet, dic_cut)
+                fra.saveToNumpy(path_parquet, path_numpy)
+                
                 plt.show()
 
     stop = timeit.default_timer()

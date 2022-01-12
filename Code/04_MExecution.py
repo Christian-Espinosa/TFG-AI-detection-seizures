@@ -20,7 +20,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 #Based on Check_ModelsArchitecture_Script
-from library.CNN_models_vrs1 import *
+from library.CNN_models_vrs2 import *
 #from eeg_util_data import * #---> What?
 import library.Dataset_Functions as dat
 
@@ -39,14 +39,15 @@ projmodule_params=None
 
 convnet_params={}
 convnet_params['kernel_size']=(1,3)
-convnet_params['Nneurons']=64
+convnet_params['Nneurons']=22
 
 outputmodule_params={}
 outputmodule_params['n_classes']=2
 
 #CUDA
 use_cuda = torch.cuda.is_available()
-device = torch.device("cuda:0" if use_cuda else "cpu")
+#device = torch.device("cuda:0" if use_cuda else "cpu")
+device = torch.device("cpu")
 torch.backends.cudnn.benchmark = True
 
 
@@ -61,16 +62,18 @@ model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params)
 optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4)
 subj = 'chb01'
 
-#dat.CheckModel(model)
-
-parquets = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/parquet/')
+dat.CheckModel(model, device)
+#Mirar de guardar el modelo
+#torch.save(model)
+"""
+parquets = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
 save_model = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj)
 for name in os.listdir(parquets):
     p_ds = pd.read_parquet(parquets + '/' + name)
     print(p_ds[0:30 ])
     # 1) data normalization
-    #data, scalers = scalers_fit(p_ds)
-    #data = scalers_transform(scalers, data)
+    data, scalers = scalers_fit(p_ds)
+    data = scalers_transform(scalers, data)
 
     train, test =  dat.SplitData(p_ds, 0.01)
     #Validation?
@@ -86,6 +89,8 @@ for name in os.listdir(parquets):
     y_true, y_pred, y_prob = dat.test_model(model, test_dataloader)
     report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
     print(report)
+    
+    """
 """
 if save_model:
 
@@ -98,3 +103,5 @@ if save_model:
     pth_file = os.path.join(pth_dir, pth_file)
     save_checkpoint(model, optimizer, np.Inf, TRAIN_CONFIG['n_epochs'], pth_file)
     """
+    
+    

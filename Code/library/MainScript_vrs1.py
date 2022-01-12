@@ -20,10 +20,10 @@ from tqdm import tqdm
 from sklearn import preprocessing
 from sklearn import model_selection
 from sklearn import metrics
-
+""" 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import torch.nn.functional as F """
 
 from eeg_globals import *
 from signals_functions import *
@@ -51,12 +51,11 @@ elif user=='AuraCVC':
     OutPut_dir = os.path.join(proj_dir,'results')
 
 elif user=='Christian':
-    subj = 'chb01/'
-    proj_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj)
+    proj_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CVC/")
     eeglib = os.path.join(proj_dir,'')
-    dataframes_dir = os.path.join(proj_dir,'parquet')
+    dataframes_dir = os.path.join(proj_dir,'dataframes')
     Data_dir= os.path.join(proj_dir,'parquet')
-    OutPut_dir = os.path.join(proj_dir,'p_slice')
+    OutPut_dir = os.path.join(proj_dir,'numpy')
     
 else:
     proj_dir = r'C:\Users\aura.CVC\OneDrive - Universitat Autònoma de Barcelona\ePilots\ML2'

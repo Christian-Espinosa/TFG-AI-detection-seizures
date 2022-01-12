@@ -1,29 +1,20 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-
+from library.eeg_models_init import *
 import numpy as np
 
-# OWN FUNCTIONS
-"""
-TFG: Check import has no problem (sintax)
-"""
-from .eeg_models_init import *
-from .eeg_util_models import * 
-from .eeg_models_layers import *
 # ========================================================================
 # CONVOLUTIONAL BLOCK  
-"""
-TFG: Quan s'hagi testejat els models amb arquitectura fixada, aquesta funció no serà necessaria
-"""
+
 def ConVNet(n_features,ker_temp):
    
    pad_temp=tuple(((np.array(ker_temp)-1)/2).astype(int))
    
    block1 = nn.Sequential(
+            #canales de entrada(elec), numero de filtros
             nn.Conv2d(1, n_features, kernel_size=ker_temp, padding=pad_temp),
-            nn.Dropout(0.1),
+            nn.Dropout(0.1), #si es menor de 0.1 desactiva la neurona
         #    nn.BatchNorm2d(n_features),
             nn.ReLU(inplace=True),
             
@@ -32,7 +23,7 @@ def ConVNet(n_features,ker_temp):
 
             # nn.Conv2d(n_features, n_features, kernel_size=ker_temp, padding=pad_temp),
             # nn.ReLU(inplace=True),
-            nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
+            nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))#corta dimension temporal, para reducir el coste computacional en la siguiente layer, e invarianza a escala
             )
 
    block2 = nn.Sequential(
@@ -63,10 +54,8 @@ def ConVNet(n_features,ker_temp):
             nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
             )
 
-   return (block1,block2,block3)
+   return [block1,block2,block3]
 
-
-# 
 # =============================================================================
 #  spatiotemporal models with different option for combining channels data
 # =============================================================================
@@ -79,30 +68,9 @@ class CNN_ConcatInput(nn.Module):
     """
 
     Convolution across time of concatenated input channels
-    1D convolutional network with concatenation of input channels.
-    Convolutional blocks are given by net_params dictionary:
+    INPUT ARGUMENTS:
         
-     1. convnet_params['kernel_size']=list of kernel sizes for each block
-        convnet_params['Nneurons']=list of neurons for the layers of each block. One entry per block
-
-        
-        ex (2 blocks with 3 layers each).  
-             convnet_params['kernel_size']=[ ]
-             convnet_params['kernel_size'].append([3,3,3])
-             convnet_params['kernel_size'].append([3,3,3])
-             
-             convnet_params['Nneurons']=[ ]
-             convnet_params['Nneurons'].append([16,32,64])
-             convnet_params['Nneurons'].append([128,128,128])
-
-    2.  projmodule_params['proj_type']: type of projection
-        projmodule_params['n_channels']: number of input channels
-        projmodule_params['Nneurons']: number of neurons for first layer 
-        if proj_type is 'Avg', omit parameter 
-            
-             projmodule_params=None
-        
-    3.  outputmodule_params['n_classes']=number of output classes
+        n_features
 
     """
     def __init__(self, projmodule_params,convnet_params,outputmodule_params):
@@ -110,89 +78,66 @@ class CNN_ConcatInput(nn.Module):
 
         print('\tRunning class: ', self.__class__.__name__)
         ### PARAMETERS 
-        
-        # Net Parameters
         self.projmodule_params=projmodule_params
         self.convnet_params=convnet_params
         self.outputmodule_params=outputmodule_params
-        
-    
         
         ##### ARCHITECTURE
         ## input block: projection (None)
         
         ## convolutional block for temporal signal processing
-        """
-            TFG: Cal posar aquest tros en aquest format i replicar-ho a tot arreu:       
-        #        self.ConvBlockList=[]
-        #        Nneurons_Block=convnet_params['Nneurons']
-        #        Kernel_Block=convnet_params['kernel_size']
-        #        
-        #        for Nneurons_conv,kernel_size_conv in zip(Nneurons_Block,Kernel_Block):
-        #            block=Conv1D_StandardBlock(NneuronsInput, Nneurons_conv.copy(),kernel_size_conv.copy(), 
-        #                     batch_config=None,p_drop_loc=0.0)
-        #            self.ConvBlockList.append(block)
-         """
-        kern_conv=convnet_params['kernel_size']  
-        n_features=convnet_params['Nneurons']
-        self.conv_net=ConVNet(n_features,kern_conv)
-
-     
-        ## output block: projection channel (None), 
-        ## projection signal (AvgPool), fc layers and classifier
-        
-        ### projector: has to be implemented in forward evaluation if
-        ### you want independence from input signal size
-        last_block=self.conv_net[-1]
-        n_output_loc=last_block[0].out_channels
-        self.outconv_proj= OutPutNetProj((1,0),n_output_loc)
+        n_features = 16 #això és temporal. En aquesta ocasió el bloc convolucional està fixat, caldrà canviar-ho més endavant
+        self.temp_net=ConVNet(n_features,convnet_params['kernel_size'])
+                    
+        ## output block: projection, fc layers and classifier
         ### classification fc layer
-        n_classes=outputmodule_params['n_classes']
+        last_block=self.temp_net[-1]
+        self.fc_out = nn.Linear(last_block[0].out_channels, outputmodule_params['n_classes'])
         
-        self.fc_out = nn.Linear(n_output_loc, n_classes)
-
         # weight init
         init_weights_xavier_normal(self)
 
     def forward(self, x):
 
-        # input is (NSamp, NChannels, LSignal)  ---> Datos unidimensionales, conv1D
-        # input is (NSamp, NChannels, Heiht, width)   ---> Datos Bidimensionales, conv2D                        
-        # LSignal=L (1 dim); LSignal=(W,H) (2 dim); LSignal=(W,H,L)
-
-        ## Input Signal Projection: Concatenation
-
-        #Definimos el batch size, los paquetes de datos
-        #Aplana los datos
-        #x=x.view(x.size(0), 1, 1, -1) #[N,NChannels*L]
-
-        x=x.view(x.size(0), -1) #[N,NChannels*L]
+        # input is (N, NChannels, L)
         
+        ## Input Signal Projection: Concatenation
+        x=x.view(x.size(0), -1) #[N,NChannels*L]
         x = torch.unsqueeze(x, dim=1) # (N, 1, NChannels*L)
         #Trick to use conv2d operator instead of conv1
-        x = torch.unsqueeze(x, dim=1) # (N, 1, 1,NChannels*L)  LSignal=(1,NChannels*L) 
+        x = torch.unsqueeze(x, dim=1) # (N, 1, 1,NChannels*L) 
+        
+        #x = self.temp_net(x) # [N, 1,1,NNeurons]
         
         ## Convolutional Block: temporal signal features
-         
-        for block in self.conv_net:
-            x=block(x)  # [N, NNeurons,1,L']
+        for layer in self.temp_net:
+            x = layer(x) # [N, 1,1,NNeurons]
+        #print(x.shape)    
         
-
+        n_inputs_loc=(x.size(2),x.size(3)) # --> Invarianza a la variación temporal (cambio de tamaño)
+        x = F.avg_pool2d(x, n_inputs_loc) #
+        
         ## Output Block
-        ### projector: Channel (None), Signal (AvgPool)
-        ### Dynamically adapt to any input length
-        n_inputs_loc=(x.size(2),x.size(3))
-        self.outconv_proj[0].kernel_size=n_inputs_loc
-        self.outconv_proj[0].stride=n_inputs_loc
-        x=self.outconv_proj(x)
+        ### classifier
         x = x.view(x.size(0), -1) # [N, NNeurons*1*1]
         
-        # x=OutPutNetProj_x(x) # [N, NNeurons*1*1]
-        ### classifier
         
-        x = self.fc_out(x)
+        #print(x.shape)  
+        x = self.fc_out(x) # --> N[,n_features*4]
         return x
-
+    
+    def parse_projlayer_params(self):
+        if 'Nneurons' not in self.projlayer_params.keys():
+            self.projlayer_params['Nneurons']=1
+        if 'kernel_size' not in self.projlayer_params.keys():
+            self.projlayer_params['kernel_size']=1  
+        
+    def get_embedding(self, x):
+        x = self.features(x)
+        kernel_size = x.shape[2]
+        x = F.avg_pool1d(x, kernel_size) # [N, C, 1]
+        x = x.view(x.size(0), -1) # [N, C]
+        return x
 # =============================================================================
 # MODELS PROCESSING EACH CHANNEL SEPARATELY AND WITH PROJECTION OF OUTPUT CHANNELS
 # =============================================================================
@@ -226,7 +171,6 @@ class CNN_ProjOut_Conv(nn.Module):
         self.temp_net=ConVNet(n_features,(1,3))
         
         ## Output Block
-
         ### projection of output signal channels
         last_block=self.temp_net[-1]
         self.spat_net = nn.Sequential(
@@ -273,7 +217,6 @@ class CNN_ProjOut_Conv(nn.Module):
 
 #######
 # Former Seq_C2D
-# Independent Processing of input channels with equal convolutional blocks
 # Output Projection: average of concatenated out channels
 
 class CNN_ProjOut_Concat(nn.Module):
@@ -284,31 +227,7 @@ class CNN_ProjOut_Concat(nn.Module):
         EEG-Based Spatio–Temporal Convolutional Neural Network for Driver Fatigue Evaluation
         Gao et al. 2019
 
-    1D convolutional network with projection of channels output convolution.
-    Each channel is processed independently using equal
-    convolutional blocks 
-    
-    Convolutional blocks are given by net_params dictionary:
-        convnet_params['kernel_size']=list of kernel sizes for each block
-        convnet_params['Nneurons']=list of neurons for the layers of each block. One entry per block
-
-        
-        ex (2 blocks with 3 layers each).  
-             convnet_params['kernel_size']=[ ]
-             convnet_params['kernel_size'].append([3,3,3])
-             convnet_params['kernel_size'].append([3,3,3])
-             
-             convnet_params['Nneurons']=[ ]
-             convnet_params['Nneurons'].append([16,32,64])
-             convnet_params['Nneurons'].append([128,128,128])
-
-        projlayer_params['proj_type']: type of projection
-        projlayer_params['n_channels']: number of input channels
-        projlayer_params['Nneurons']: number of neurons for first layer 
-        if proj_type is 'Avg', omit parameter
-    
-    
-    
+    Input data is [N, features=14, timestep=40]
     """
 
     def __init__(self, n_nodes=14, n_classes=2, n_features= 16,n_features_out=50):
@@ -316,24 +235,18 @@ class CNN_ProjOut_Concat(nn.Module):
 
         print('running class ', self.__class__.__name__)
 
-        
+      
         # conv block parameters
         ker_temp = (1,3) # kernel for temporal dim
         #  temporal signal output projection parameter
             
         self.avg_pool_kernel_stride = 2
         
-        ##### ARCHITECTURE
-        ## input block: projection (None)
-        
-        ## Convolutional Block: temporal signal net
+        ## temporal signal net
         self.temp_net=ConVNet(n_features,ker_temp)
         
-        ## Output Block:
-        ### projection of output channels
-        """
-        TFG: Cal posar això usant OutPutNetProj (if possible) i replicar a totes les classes que ho requereixin
-        """
+        
+        ## projection of output channels
         last_block=self.temp_net[-1]
         self.outchannel_proj = nn.Sequential(
             # Elias avg pooling
@@ -344,7 +257,7 @@ class CNN_ProjOut_Concat(nn.Module):
 
             )
         
-        ### classifier
+        # classifier
         self.fc_out = nn.Linear(n_features_out, n_classes)
 
         # weight init
@@ -358,11 +271,8 @@ class CNN_ProjOut_Concat(nn.Module):
         ## temporal features
         x = self.temp_net(x) # (N, NNeurons, NChannels, L')
 
-        ## Output Block:
-       
-        
-        ### signal pooling 
-        ### to become invariant to input length
+        ## output channel projection
+        # to become invariant to input length
        
         n_inputs_loc=(x.size(2),x.size(3))
         x = F.avg_pool2d(x,(1,n_inputs_loc[1]))  # (N, NNeurons, NChannels, 1)
@@ -372,11 +282,11 @@ class CNN_ProjOut_Concat(nn.Module):
 #        x=F.avg_pool2d(x, kernel_size=(1, temp_dim // self.avg_pool_kernel_stride),
 #                         stride=(1, temp_dim // self.avg_pool_kernel_stride))
 
-        ### projection of output channels
+        # spatial features
         x = x.view(x.size(0), -1)   # (N, NNeurons*NChannels)
         x = self.outchannel_proj(x)  # (N, NNeuronsOut)
         
-        ### classifier
+        ## classifier
         x = self.fc_out(x)
 
         return x
@@ -405,11 +315,7 @@ class CNN_ProjOut_AvgW(nn.Module):
         ## temporal signal net
         self.temp_net=ConVNet(n_features,ker_temp)
         
-        ## Output Block:
-        """
-        TFG: Cal posar això usant OutPutNetProj i replicar a totes les classes que ho requereixin
-        """
-    
+        
         ## projection of output channels
         self.outchannel_proj = nn.Sequential(
             nn.Conv2d(1, 1, kernel_size=(1,n_nodes)),
@@ -475,26 +381,12 @@ class CNN_ProjChannel(nn.Module):
 
         ##### ARCHITECTURE
         ## Projection Block
-       
-        """      
-                # TFG: Cal posar el self.inchannel_proj en aquest format
-                
-        #        n_channels=projlayer_params['n_channels']
-        #        NneuronsInput= projlayer_params['Nneurons']
-        #        kernel_size=projlayer_params['kernel_size']
-        #        proj_type=projlayer_params['proj_type']
-        #        
-        #        self.proj_layer= InputChannelProj(
-        #                proj_type=proj_type,n_channels, 
-        #                n_output_loc=NneuronsInput,kernel_size=kernel_size)
-        """        
         self.inchannel_proj = nn.Sequential(
             nn.Conv2d(1, n_features, kernel_size=(n_nodes,1), stride=(1,1)),
             nn.ReLU(inplace=True),
             nn.Dropout(0.1)
             # nn.BatchNorm2d(n_features),
             )
-       
         
          ## temporal signal net
         self.temp_net=ConVNet(n_features,(1,3))
@@ -545,19 +437,6 @@ class CNN_ProjChannel_v2(nn.Module):
        
         ##### ARCHITECTURE
         ## Projection Block
-               
-        """      
-                # TFG: Cal posar el self.inchannel_proj en aquest format
-                
-        #        n_channels=projlayer_params['n_channels']
-        #        NneuronsInput= projlayer_params['Nneurons']
-        #        kernel_size=projlayer_params['kernel_size']
-        #        proj_type=projlayer_params['proj_type']
-        #        
-        #        self.proj_layer= InputChannelProj(
-        #                proj_type=proj_type,n_channels, 
-        #                n_output_loc=NneuronsInput,kernel_size=kernel_size)
-        """      
         self.inchannel_proj = nn.Sequential(
             nn.Conv2d(1, n_features, kernel_size=(n_nodes,1), stride=(1,1)),
             nn.ReLU(inplace=True),
@@ -566,20 +445,6 @@ class CNN_ProjChannel_v2(nn.Module):
             )
         
          ## temporal signal net
-         
-                       
-        """      
-                # TFG: Cal posar el self.temp_net en aquest format
-                
-        #        self.ConvBlockList=[]
-        #        Nneurons_Block=convnet_params['Nneurons']
-        #        Kernel_Block=convnet_params['kernel_size']
-        #        
-        #        for Nneurons_conv,kernel_size_conv in zip(Nneurons_Block,Kernel_Block):
-        #            block=Conv1D_StandardBlock(NneuronsInput, Nneurons_conv.copy(),kernel_size_conv.copy(), 
-        #                     batch_config=None,p_drop_loc=0.0)
-        #            self.ConvBlockList.append(block)
-        """       
         self.temp_net=ConVNet(n_features,(1,3))
         
 

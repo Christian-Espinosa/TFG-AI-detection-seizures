@@ -1,4 +1,5 @@
 from os import path
+import os, sys
 import pyedflib
 import numpy as np
 import pyarrow as pa
@@ -70,7 +71,7 @@ def setLabels(dic, f, n, hz=256):
     #f --> path to summary of the file
     #hz --> hertz of samples
 
-    dic['labels'] = np.zeros(len(dic[list(dic.keys())[-1]]), dtype=np.int8)
+    dic['seizure'] = np.zeros(len(dic[list(dic.keys())[-1]]), dtype=np.int8)
     name = f[-17:][:-12] #Get last part of string and delete .txt
     with open(f, 'r') as file:
         lines = file.readlines()
@@ -86,9 +87,79 @@ def setLabels(dic, f, n, hz=256):
                     i += 1
                     fi = int(lines[i].strip()[:-8].replace('Seizure End Time: ',''))*hz
                     for x in range(ini, fi):
-                        dic['labels'][x] = 1
+                        dic['seizure'][x] = 1
                 return dic
     return None
 
 def saveToParquet(dic, path):
     pd.DataFrame.from_dict(dic).to_parquet(path)
+
+def chunkData(path, dic_cut):
+    
+    eeg_df = pd.read_parquet(os.path.abspath(path))
+    print('Step 1. Split data, parquet loaded', eeg_df.shape)
+    print('Cutting signal...')
+    df_windows = cut_signal_CHB(eeg_df,dic_cut)
+    print('saving...')
+    df_windows.to_parquet(path, engine='pyarrow', compression='brotli', use_deprecated_int96_timestamps=True)
+    print('parquet saved')
+
+    del df_windows
+
+def saveToNumpy(path_parquet, path_numpy):
+    # generate two files data_x and data_y
+    eeg_df = pd.read_parquet(path_parquet)
+    print('Generate two files data_x and data_y. Create input features, parquet loaded', eeg_df.shape)
+    
+    print('Creating numpy xy...')
+    data_x, data_y = input_features(eeg_df)
+
+    print("Saving numpys...")
+    np.save(os.path.abspath(path_numpy + '_data_x.npy'), data_x)
+    np.save(os.path.abspath(path_numpy + '_data_y.npy'), data_y)
+    print('file saved')
+    
+def cut_signal_CHB(df,dic_cut, hz=256):
+    
+    df['observation'] = -1
+    
+    #Function to split data into windows to feed the model
+    sample_win = int(hz * dic_cut['window'])
+    sample_over = int(hz * dic_cut['overlap'])
+    sample_stride = sample_win - sample_over
+    
+    
+    # To data, add a column observation based on phase
+    print('Split data into windows ("observation" label)')
+    n_intervals = int(np.floor(( df.shape[0] - sample_win ) / sample_stride) + 1)
+    obs = 1
+    for k in range(n_intervals):
+        df.loc[k * sample_stride : k * sample_stride + sample_win,'observation'] = obs
+        #df['observation'].iloc[k * dif : k * dif + sample_win] = obs
+        obs += 1
+    
+    df = df.drop(df[df.observation == -1].index)
+    
+    return df
+
+def input_features(df):
+    data_x = []
+    data_y = []
+    for k in df.observation.unique():
+        data_x.append(df.loc[df.observation == k].values[:, :-2].T)
+        
+        #data_y.append(df.loc[df.observation == k].values[:, -2:])
+
+        obs = df.loc[df.observation == k].values[0, -1]
+        label = 1 if(df.loc[df.observation == k].values[:, -2].sum() > 0) else 0
+        
+        data_y.append([obs, label])
+                
+        
+    # concatenate along the rows axis
+
+    data_x = np.stack(data_x, axis=0)
+    data_x = data_x.astype(np.float32)
+    data_y = np.stack(data_y, axis=0)
+    
+    return data_x, data_y 
