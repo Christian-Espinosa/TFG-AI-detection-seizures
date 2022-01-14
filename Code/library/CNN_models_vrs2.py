@@ -54,7 +54,7 @@ def ConVNet(n_features,ker_temp):
             nn.MaxPool2d(kernel_size=(1,2), stride=(1,2))
             )
 
-   return [block1,block2,block3]
+   return (block1,block2,block3)
 
 # =============================================================================
 #  spatiotemporal models with different option for combining channels data

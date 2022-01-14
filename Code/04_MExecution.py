@@ -6,6 +6,7 @@ import pandas as pd
 import sys
 import pickle
 import glob
+from datetime import date
 
 #NUMERIC
 import numpy as np
@@ -23,24 +24,20 @@ import torch.nn.functional as F
 from library.CNN_models_vrs2 import *
 #from eeg_util_data import * #---> What?
 import library.Dataset_Functions as dat
-
+from library.eeg_dataset import *
 from  library.eeg_util_data import *
 
 #-----------Configure Data Set-----------
-#path_chuncker = os.path.abspath("Code\\library\\MainScript_vrs1.py")
-#exec(open(path_chuncker).read())
+path_model = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/trys")
+path_save_model =  os.path.abspath(path_model + "/" + date.today().strftime("%d/%m/%Y_%H%M%S") + ".pt")
+path_load_model = os.path.abspath(path_model + "/" + ""+ ".pt")
 
-#-------------Open Data-------------
-#pathtoChuncks = os.path.abspath("D:\\UAB\\4to\\DataSetTFG\\CVC\\dataframes\\cvc_eeg_power.parquet")
-#x_test = pd.read_parquet(pathtoChuncks)
 
 #-----------Define Hyperparameters-----------
 projmodule_params=None
-
 convnet_params={}
 convnet_params['kernel_size']=(1,3)
 convnet_params['Nneurons']=22
-
 outputmodule_params={}
 outputmodule_params['n_classes']=2
 
@@ -50,8 +47,6 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cpu")
 torch.backends.cudnn.benchmark = True
 
-
-
 # Parameters
 params = {'batch_size': 750,
           'shuffle': False,
@@ -60,48 +55,48 @@ params = {'batch_size': 750,
 criterion = nn.CrossEntropyLoss()
 model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params)
 optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4)
-subj = 'chb01'
 
-dat.CheckModel(model, device)
-#Mirar de guardar el modelo
-#torch.save(model)
-"""
-parquets = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
-save_model = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj)
-for name in os.listdir(parquets):
-    p_ds = pd.read_parquet(parquets + '/' + name)
-    print(p_ds[0:30 ])
-    # 1) data normalization
-    data, scalers = scalers_fit(p_ds)
-    data = scalers_transform(scalers, data)
-
-    train, test =  dat.SplitData(p_ds, 0.01)
-    #Validation?
-
-    #Train
-    train_dataloader = torch.utils.data.DataLoader(train, batch_size=params["batch_size"], shuffle=params["shuffle"])
-    model, avg_cost = dat.train_model(model, optimizer, criterion, train_dataloader)
-
-
-    #Test
-    test_dataloader = torch.utils.data.DataLoader(test.loc[:, train.columns != 'b'], batch_size=params["batch_size"], shuffle=params["shuffle"])
-
-    y_true, y_pred, y_prob = dat.test_model(model, test_dataloader)
-    report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
-    print(report)
+if False:
+    dat.CheckModel(model, device)
+else:
+        
+    subj = 'chb01'
+    numpys = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
+    save_model = True
     
-    """
-"""
-if save_model:
+    for file in range(1,len(os.listdir(numpys))):
+        
+        #Load Data
+        filename_x = subj + "_{:02.0f}".format(file) + '_data_x.npy'
+        filename_y = subj + "_{:02.0f}".format(file) + '_data_y.npy'
+        if os.path.exists(os.path.join(numpys,filename_x)):
+            data_x = np.load(os.path.join(numpys,filename_x), allow_pickle=True)
+            data_y = np.load(os.path.join(numpys,filename_y), allow_pickle=True)
+            
+            train_data_x, train_data_y, test_data_x, test_data_y = dat.select_subject_train_test_data(data_x, data_y, 0.5)
+            
+            # 1) data normalization
+            train_data_x, scalers = dat.scalers_fit(train_data_x)
+            test_data_x = dat.scalers_transform(scalers, test_data_x)
 
-    pth_dir = os.path.join(OutPut_Dir, 'pretrained', MODEL_NAME)
-    if not os.path.exists(pth_dir):
-        os.makedirs(pth_dir)
+            #Train
+            train_dataloader = torch.utils.data.DataLoader(train_data_x, batch_size=params["batch_size"], shuffle=params["shuffle"])
+            model, avg_cost = dat.train_model(model, optimizer, criterion, train_dataloader, None, params["n_epochs"])
+            if save_model:
+                torch.save(model, path_save_model)
 
-    pth_file =  subject + '_md_' + MODEL_NAME + '_ep_' + str(TRAIN_CONFIG['n_epochs']) + \
-            '_lr_' + '{:.0e}'.format(TRAIN_CONFIG['lr']) + '_exp_' + EXP_TYPE + '.pth'
-    pth_file = os.path.join(pth_dir, pth_file)
-    save_checkpoint(model, optimizer, np.Inf, TRAIN_CONFIG['n_epochs'], pth_file)
-    """
-    
-    
+            #Test
+            
+            test_dataset = EEG_Dataset(test_data_x, test_data_y)
+            test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
+
+            y_true, y_pred, y_prob = dat.test_model(model, test_dataloader)
+            
+            #y_true ->  grountruth 0, 1 si es seizure o no
+            #y_perd -> 0, 1 segun haya predicho el modelo
+            #y_prob ->  probabilidades 
+            
+            report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
+            print(report)
+            
+            

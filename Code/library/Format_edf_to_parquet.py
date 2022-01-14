@@ -66,11 +66,13 @@ def set_seizure_labeling(df, edf_f, path_parquet=None):
     return df
 """
 def setLabels(dic, f, n, hz=256):
-    #sets labels to a file using summary
-    #dic --> dictionary of the file
-    #f --> path to summary of the file
-    #hz --> hertz of samples
-
+    """
+    **Sets labels to a file using summary**
+    dic --> dictionary of the file
+    f --> path to summary of the file
+    n --> edf file of the subject
+    hz --> hertz of samples
+    """
     dic['seizure'] = np.zeros(len(dic[list(dic.keys())[-1]]), dtype=np.int8)
     name = f[-17:][:-12] #Get last part of string and delete .txt
     with open(f, 'r') as file:

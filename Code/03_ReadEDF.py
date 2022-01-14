@@ -67,7 +67,7 @@ def check_23electrodes(f, name, c):
 # --> /CVC
 
 #Define Variables and Read edf
-single_execution = True
+single_execution = False
 
 #FILTERING FEATURES
 f_range = 'theta'
@@ -95,7 +95,7 @@ if single_execution:
     #Paths
     file_name = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf/" + name_edf + ".edf")
     path_parquet = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/parquet/" + name_edf + ".parquet")
-    path_numpy = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/parquet/" + name_edf)    
+    path_numpy = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/numpy/" + name_edf)    
     file_summary = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/" + summary + ".txt")
 
     #%%
@@ -134,24 +134,26 @@ if single_execution:
     # %%
 else:
     # %%
-    n_subjects = 1
+    n_subjects = 2
+    show_plots = False
     print("Start {} subjects".format(n_subjects))
     start = timeit.default_timer()
 
     #For every subject
-    for i in range(n_subjects):
+    for i in range(1,n_subjects):
         subj = "chb{:02.0f}".format(i)
         summary = subj + "-summary"
-        elem = os.listdir(os.path.abspath(os.path.join(os.path.join(os.getcwd(), os.pardir), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf"))
+        elem = os.listdir(os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf"))
         #Only considers files .edf in the directory of the edfs
-        for j in range(len(elem)):
-            if elem[j][-4:] ==  ".edf":
-                name_edf = subj + "_chb{:02.0f}".format(i) + "_{:02.0f}".format(j)
+        for j in range(1,len(elem)):
+            print('################')
+            if elem[j-1][-4:] ==  ".edf":
+                name_edf = elem[j-1][:-4]
                 #name_edf = elem[j][:-4]
                 file_name = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf/" + name_edf + ".edf")
                 path_parquet = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/chb01/parquet/" + name_edf + ".parquet")
-                path_numpy = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/parquet/" + name_edf)
-                file_summary = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + summary + ".txt")
+                path_numpy = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/numpy/" + name_edf)
+                file_summary = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/' + summary + ".txt")
                 
                 edf_f = pyedflib.EdfReader(file_name)
                 _ , dic = fra.Create_parquet_from_edf(edf_f, path_parquet)
@@ -159,16 +161,16 @@ else:
                 dic = setBandwidth(dic, dic_band_definitions['maxrange'], hz)
                 dic = setBandwidth(dic, dic_band_definitions[f_range], hz)
                 if(check_23electrodes(file_summary, summary, channels)):
-                    print("Subject: {} is ok".format(i))
-                dic = fra.setLabels(dic, file_summary)
+                    print("{} is ok".format(name_edf, j))
+                dic = fra.setLabels(dic, file_summary, j)
                 if dic == None:
                     print("Error in labeling!")
 
                 fra.saveToParquet(dic, path_parquet)
                 fra.chunkData(path_parquet, dic_cut)
                 fra.saveToNumpy(path_parquet, path_numpy)
-                
-                plt.show()
+                if show_plots:
+                    plt.show()
 
     stop = timeit.default_timer()
     print('Time: ', stop - start)
