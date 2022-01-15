@@ -145,10 +145,11 @@ else:
         summary = subj + "-summary"
         elem = os.listdir(os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf"))
         #Only considers files .edf in the directory of the edfs
-        for j in range(1,len(elem)):
+        for j in range(len(elem)):
             print('################')
-            if elem[j-1][-4:] ==  ".edf":
-                name_edf = elem[j-1][:-4]
+            if elem[j][-4:] ==  ".edf":
+                name_edf = elem[j][:-4]
+                f = int(name_edf[-1])
                 #name_edf = elem[j][:-4]
                 file_name = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + "/edf/" + name_edf + ".edf")
                 path_parquet = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/chb01/parquet/" + name_edf + ".parquet")
@@ -161,8 +162,8 @@ else:
                 dic = setBandwidth(dic, dic_band_definitions['maxrange'], hz)
                 dic = setBandwidth(dic, dic_band_definitions[f_range], hz)
                 if(check_23electrodes(file_summary, summary, channels)):
-                    print("{} is ok".format(name_edf, j))
-                dic = fra.setLabels(dic, file_summary, j)
+                    print("{} is ok".format(name_edf, f))
+                dic = fra.setLabels(dic, file_summary, f)
                 if dic == None:
                     print("Error in labeling!")
 

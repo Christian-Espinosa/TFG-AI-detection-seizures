@@ -80,17 +80,17 @@ else:
             test_data_x = dat.scalers_transform(scalers, test_data_x)
 
             #Train
-            train_dataloader = torch.utils.data.DataLoader(train_data_x, batch_size=params["batch_size"], shuffle=params["shuffle"])
-            model, avg_cost = dat.train_model(model, optimizer, criterion, train_dataloader, None, params["n_epochs"])
+            train_dataset = EEG_Dataset(train_data_x, train_data_y[:,-1])
+            train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
+            model, avg_cost = dat.train_model(device, model, optimizer, criterion, train_dataloader, None, params["n_epochs"])
             if save_model:
                 torch.save(model, path_save_model)
 
             #Test
-            
             test_dataset = EEG_Dataset(test_data_x, test_data_y)
             test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
 
-            y_true, y_pred, y_prob = dat.test_model(model, test_dataloader)
+            y_true, y_pred, y_prob = dat.test_model(device, model, test_dataloader)
             
             #y_true ->  grountruth 0, 1 si es seizure o no
             #y_perd -> 0, 1 segun haya predicho el modelo

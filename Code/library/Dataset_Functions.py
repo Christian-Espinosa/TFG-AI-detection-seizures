@@ -31,7 +31,7 @@ def SplitDataPandas(data, perc, labeloffirstelement = 'FP1-F7'):
     train = data.iloc[:n_tr]
     test = data.iloc[n_tr:]
     return train, test
-    """
+    
     
 def select_subject_train_test_data(data_x, data_y, percentage = 0.5):
 
@@ -54,7 +54,7 @@ def select_subject_train_test_data(data_x, data_y, percentage = 0.5):
     test_data_x = data_x[chosen_rows, :]
     test_data_y = data_y[chosen_rows, :]
     return train_data_x, train_data_y, test_data_x, test_data_y
-
+"""
 ##############Normalize
 def scalers_fit(x_train):
     # source https://scikit-learn.org/stable/auto_examples/preprocessing/plot_all_scaling.html
@@ -143,7 +143,7 @@ def test_model(model, test_dataloader):
 """
 
 
-def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
+def train_model(device, model, optimizer, criterion, train_dataloader, valid_dataloader,
                 n_epochs, verbose=1, save_path='./pretrained/model.pt',
                 best_val_loss=None):
 
@@ -163,11 +163,11 @@ def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
         iter_train_dataset = iter(train_dataloader)
         for k in range(total_train_batch):
             seqs, targets = next(iter_train_dataset)
-            seqs, targets = seqs.cuda(), targets.cuda()
+            seqs, targets = seqs.to(device), targets.to(device)
 
             optimizer.zero_grad()
-            # outputs = model(seqs)
-            outputs, _ = model(seqs) # returned second value is probs
+            outputs = model(seqs)
+            #outputs, _ = model(seqs) # returned second value is probs
             loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
@@ -184,7 +184,7 @@ def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
                 iter_valid_dataset = iter(valid_dataloader)
                 for k in range(total_valid_batch):
                     seqs, targets = next(iter_valid_dataset)
-                    seqs, targets = seqs.cuda(), targets.cuda()
+                    seqs, targets = seqs.to(device), targets.to(device)
                     # outputs = model(seqs)
                     outputs, _ = model(seqs) # returned second value is probs
                     loss = criterion(outputs, targets)
@@ -205,7 +205,7 @@ def train_model(model, optimizer, criterion, train_dataloader, valid_dataloader,
     return model, avg_cost
 
 
-def test_model(model, test_dataloader):
+def test_model(device, model, test_dataloader):
 
     total_test_batch = len(test_dataloader)
 
@@ -217,14 +217,14 @@ def test_model(model, test_dataloader):
         iter_test_dataset = iter(test_dataloader)
         for k in range(total_test_batch):
             seqs, targets = next(iter_test_dataset)
-            seqs, targets = seqs.cuda(), targets.cuda()
+            seqs, targets = seqs.to(device), targets.to(device)
             print("seqs: ",seqs)
             outputs, probs = model(seqs)
-            pred = outputs.max(1, keepdim=True)[1].cpu().numpy()
+            pred = outputs.max(1, keepdim=True)[1].to(device).numpy()
 
             y_pred.extend(list(pred.reshape(-1,)))
-            y_pred_probs.append(probs.cpu().numpy())
-            y_true.extend(list(targets.cpu().numpy()))
+            y_pred_probs.append(probs.to(device).numpy())
+            y_true.extend(list(targets.to(device).numpy()))
 
     # avg_acc = metrics.accuracy_score(y_true, y_pred)
     # avg_prec = metrics.precision_score(y_true, y_pred,
