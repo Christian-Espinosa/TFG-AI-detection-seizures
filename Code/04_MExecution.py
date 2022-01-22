@@ -51,7 +51,7 @@ torch.backends.cudnn.benchmark = True
 params = {'batch_size': 750,
           'shuffle': False,
           'num_workers': 6,
-          'n_epochs': 100}
+          'n_epochs': 1}#100
 criterion = nn.CrossEntropyLoss()
 model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params)
 optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4)
@@ -62,7 +62,7 @@ else:
         
     subj = 'chb01'
     numpys = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
-    save_model = True
+    save_model = False
     
     for file in range(1,len(os.listdir(numpys))):
         
