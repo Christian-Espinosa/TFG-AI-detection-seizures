@@ -17,7 +17,7 @@
 \captionsetup[table]{textfont=sc}
 
 \author{\LARGE\sffamily Christian Espinosa Reboredo}
-\title{\Huge{\sffamily Recognition of cognitive states from EEG data}}
+\title{\Huge{\sffamily Recognition of epileptic seizures from EEG data}}
 \date{}
 
 \newcommand\blfootnote[1]{%
@@ -110,27 +110,16 @@ when the subject is having a seizure.
 \blfootnote{$\bullet$ Curs 2021/22}
 
 \section{Introduction}
-
+\leavevmode\\
 \lettrine[lines=3]{A}{n} epileptic seizure is a period of symptoms due to abnormally excessive or synchronous neuronal activity in the brain. This can cause different effects like uncontrolled shaking movements involving much of the body, parts of the body or subtle momentary loss of awareness. In order to understand this issue, it is important to understand how neurons work and interact with each other to conserve what we call consciousness represented as brain activity and brainwaves. 
 \\
 Neural oscillations are rhythmic or repetitive patterns of neural activity in the central nervous system which can be driven by mechanisms within individual neurons or by interactions. Since 1824 neural oscillations have been observed, fifty years later intrinsic oscillatory behaviour was encountered in vertebrate neurons, but the purpose of these is yet to be fully understood.
 \\
-In order to understand better brain activity in this TFG tries to dig deeper using new technology like deep learning to try to understand what humans are incapable of doing. First of all, it will be needed an inside view on how the brain works to have a hint on how to extract or intercept information from the neurons to process externally in a computer as well as a view on how deep learning algorithm’s function and get results from data, because it’s the best way to process and get the most out of it. Afterwards an insight of previous papers is given to set a view point on how research has been made up until this point. A well-known database (CHB-MIT)\cite{goldberger2000physiobank} is introduced of encephalograms collected from 23 subject with interactable seizures that has been used in previous research.
+As the main objective is to classify seizures from brain activity first of all, it will be needed an inside view on how the brain works to have a hint on how and what is done to extract or intercept information from the neurons to process externally in a computer. This information is available annexed in this paper just to have an overview to further understand the subject, but this matter is not the main purpose of this paper as it specifies in data processing, architecture, model strategies and classification results.
 \\
-Once everything is acknowledged objectives of in this TFG are settled for further research on this issue. First of all, data planning and different treatment procedures are important to see how algorithms behave giving better or worse results, as well as which algorithm architectures are better to process EEG data. Finally, once all the research is done the classifier is to be expected to classify moments where seizures occur on the patients in a given moment.
-\\
-
-\subsection{Dataset}
-\leavevmode\\
-The dataset\cite{goldberger2000physiobank} is data collected from the Children’s Hospital Boston, consisting in EEG recordings of subjects with intractable seizures. The folders classify in 23 cases from 22 subjects (case chb21 and chb1 are the same but 1.5 years apart). The subject’s personal information gender and age is in a separate file called SUBJECT-INFO added in this paper as subject\_info.csv.
-\\
-Each case contains between 9 and 42 .edf files. There are .edf files of EEG signals without seizures and others with recordings of seizures, these defined in RECORDS-WITH-SEIZURES. The files with seizures have the extension .edf.seizures which disables the possibility of accessing the file with a normal edf reader library.
-\\
-Most cases have 1 hour of EEG recordings, but some have 1 to 4 hours depending on the case, split between 9 to 42 edf recordings, recorded at 256Hz in 16 bit resolution.
-\\
+In this TFG we detail the complete process of epileptic seizure detection, from data processing to seizure recognition. Because this TFG works as a pipeline of different stages, an insight view of each is done, starting from data processing from a well-known database (CHB-MIT) of encephalograms collected from 23 subject with interactable seizures that has been used in previous research. Followed by the strategy of the architecture used to classify the signals to finally understand the classified results into seizure and not seizure.
 
 \input{related_work.tex}
-
 
 \section{Objectives}
 \label{sec-objectives}
@@ -154,33 +143,8 @@ The next objective after obtaining data is to use different models provided by t
 \end{itemize}
 \leavevmode\\
 
-\section{Tasks}
-\label{sec-tasks}
-To start from somewhere the first task will be to use an already done deep learning algorithm from the research group IAM from the CVC, which is working on a framework to determine the optimal architecture for cognitive state recognition from EEG signals, with the objective to answer different questions:
-\begin{itemize}
-  \item How to combine the signals to create the input features for feature extraction? In this case, having 14 sensors x 5 waves, so 70 raw signals. These signals can be concatenated, or projected. As well, in case of projection, the weights can be equal or learned.
-  \item Which neural network is the best performer?
-  \item Is it better to ensemble the different classifiers before combining the signals?
-\end{itemize}
+\input{methods.tex}
 \leavevmode\\
-This framework was originally intended to study brain workload, so, within this framework, the idea is to modify it to fulfil the objective of clinic seizure detection. In this TFG, different strategies will be applied on the input data of the algorithm to further study it’s capabilities.
-\\
-Because in this TFG the CHB-MIT Scalp EEG Database\cite{goldberger2000physiobank} is being used and all files are in format “.edf” a first script has been needed to change the format from “.edf” to “.parquet”. This script is called “03\_ReadEDF.py”, being the first script to execute this TFG. It’s designed to extract the files from a specific folder hierarchy where all the encephalograms are classified by subjects. For simplicity this script obtains, filters, plots, and saves in parquets all input data. Datasets provided by the cvc have also been used, but the scripts used to read, filter and split data is “MainSource\_vr1.py”.
-\\
-In the “03\_ReadEDF.py” script there are different options on how raw data is imported, and also there are options on the way to execute them. Because during the development of this TFG many tests have been done, there are two different ways to execute the script:
-\\
-\begin{itemize}
-  \item Single execution, where the subject number and the edf file of the subject needs to be provided to execute the script for this single file. 
-  \item Multiple executions, where the number of subjects is provided. The script will go though all the first n subjects defined.
-\end{itemize}
-\leavevmode\\
-The script will automatically label all raw data using the summary file in each subject’s folder, so it’s important for it to be present or a label execution error will pop up. The files “.edf.seizures” in every subject’s folder were unreadable, even reading the binary was a failure. The script will make sure the file has all the data from the desired electrodes, this is important because hardware problems while recording the edfs some files have gaps or lack some data, if any edf file have this problem it will automatically be excluded and the user will be notified.
-\\
-Filtering data is done by first setting a maximum range from 0.5hz to 50hz, and afterwards only by changing the name of a parameter it can be changed to delta, theta, alpha, beta or gamma’s range frequencies in a dictionary added by default. Everything is modular so it can be changed any time with any range of frequencies. All data is saved in “.parquet” format in a different folder named parquets in every subject’s folder, if plotting is enabled it will plot each subject’s data.
-\\
-\\
-After all desired raw data is filtered and saved, the second script to execute is “04\_MExecution.py”, this one is in charge of the execution of the model to obtain the results classifying the data. All hyperparameters are defined at the beginning of the script, and afterword’s the module is tested with random data to ensure it’s working as expected. For each parquet it splits it’s content depending of the percentage settled in training and testing, continuing by training the model and testing.
-\\
 
 \begin{figure}[h]
   \caption{Scheme of data processing }
