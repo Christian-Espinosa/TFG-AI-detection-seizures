@@ -39,9 +39,9 @@ def select_subject_train_test_data(data_x, data_y, percentage = 0.5):
     chosen_rows = int(math.floor(rows*percentage))
 
     train_data_x = data_x[:chosen_rows, :, :]
-    train_data_y = data_y[:chosen_rows, :]
+    train_data_y = data_y[:chosen_rows, -1]
     test_data_x = data_x[chosen_rows:, :, :]
-    test_data_y = data_y[chosen_rows:, :]
+    test_data_y = data_y[chosen_rows:, -1]
     return train_data_x, train_data_y, test_data_x, test_data_y
 """
 def select_subject_train_test_data(data_x, data_y, percentage = 0.5):
@@ -219,12 +219,14 @@ def test_model(device, model, test_dataloader):
             seqs, targets = next(iter_test_dataset)
             seqs, targets = seqs.to(device), targets.to(device)
             print("seqs: ",seqs)
-            outputs, probs = model(seqs)
-            pred = outputs.max(1, keepdim=True)[1].to(device).numpy()
-
+            outputs = model(seqs)
+            pred = outputs.max(1, keepdim=True)[1].cpu().numpy()
+            probs = torch.softmax(outputs,dim=1)
+            
+            
             y_pred.extend(list(pred.reshape(-1,)))
-            y_pred_probs.append(probs.to(device).numpy())
-            y_true.extend(list(targets.to(device).numpy()))
+            y_pred_probs.append(probs.cpu().numpy())
+            y_true.extend(list(targets.cpu().numpy()))
 
     # avg_acc = metrics.accuracy_score(y_true, y_pred)
     # avg_prec = metrics.precision_score(y_true, y_pred,
@@ -235,4 +237,4 @@ def test_model(device, model, test_dataloader):
     y_pred_probs = np.concatenate(y_pred_probs, axis=0)
     y_pred_probs = np.round(y_pred_probs, 2)
 
-    return (y_true, y_pred), y_pred_probs
+    return y_true, y_pred, y_pred_probs

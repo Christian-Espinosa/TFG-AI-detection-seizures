@@ -112,55 +112,26 @@ when the subject is having a seizure.
 \section{Introduction}
 \leavevmode\\
 \lettrine[lines=3]{A}{n} epileptic seizure is a period of symptoms due to abnormally excessive or synchronous neuronal activity in the brain. This can cause different effects like uncontrolled shaking movements involving much of the body, parts of the body or subtle momentary loss of awareness. In order to understand this issue, it is important to understand how neurons work and interact with each other to conserve what we call consciousness represented as brain activity and brainwaves. 
-\\
+\\\\
 Neural oscillations are rhythmic or repetitive patterns of neural activity in the central nervous system which can be driven by mechanisms within individual neurons or by interactions. Since 1824 neural oscillations have been observed, fifty years later intrinsic oscillatory behaviour was encountered in vertebrate neurons, but the purpose of these is yet to be fully understood.
-\\
+\\\\
 As the main objective is to classify seizures from brain activity first of all, it will be needed an inside view on how the brain works to have a hint on how and what is done to extract or intercept information from the neurons to process externally in a computer. This information is available annexed in this paper just to have an overview to further understand the subject, but this matter is not the main purpose of this paper as it specifies in data processing, architecture, model strategies and classification results.
-\\
+\\\\
 In this TFG we detail the complete process of epileptic seizure detection, from data processing to seizure recognition. Because this TFG works as a pipeline of different stages, an insight view of each is done, starting from data processing from a well-known database (CHB-MIT) of encephalograms collected from 23 subject with interactable seizures that has been used in previous research. Followed by the strategy of the architecture used to classify the signals to finally understand the classified results into seizure and not seizure.
+\\
 
 \input{related_work.tex}
-
-\section{Objectives}
-\label{sec-objectives}
-There are two main objectives in this TFG. The first objective is to find the best way to treat and analyse before feeding it to the deep learning algorithms. For example, as a continuous stream of sequence, dividing data per subject…  Or trying different test/train strategies such as leave one out, 50/50… The second main objective is to try to find which algorithms architectures have better results. There are different models offered by the research group IAM from the CVC.
-\\
-To fulfil the objectives is crucial to define smaller objectives to make work easier. Within the first objective there are several important parts. 
-\\
-\begin{itemize}
-  \item Raw data must be readable, as the data base CHB-MIT\cite{goldberger2000physiobank} is in European Data Format (EDF), a standard file format designed for exchange and storage of medical time series, so all files in the dataset are “.edf”. A script has been programmed to save .edf files into .parquet format.
-  \item Setting different functions to filter data making sure data is okey and fits certain constraints. 
-  \item Get the labelling data, to have a ground truth from the recorded data. This part is essential to understand if the model works as expected.
-  \item Define different functions to define how data enters the model to be trained. There are many ways information can be extracted from data. 
-\end{itemize}
-\leavevmode\\
-The next objective after obtaining data is to use different models provided by the research group to IAM:
-\\
-\begin{itemize}
-  \item Each model needs to be configured to accept the dimensionality of the data fed to it.
-  \item Work different models to choose what models give better answers form input data.
-  \item After all the models results, an overview is done to understand the results and conclude the best way to treat this database, for further investigation.
-\end{itemize}
-\leavevmode\\
-
+\input{objectives.tex}
 \input{methods.tex}
-\leavevmode\\
 
-\begin{figure}[h]
-  \caption{Scheme of data processing }
-  \centering
-  \includegraphics[width=0.5\textwidth]{img/FeatureProjectorModel.png}
-\end{figure}
-\leavevmode\\
-During the implementation of this procedure, a lot of problems of dependency on critical libraries has happened. Starting by cuda, for faster results it is used in all models, but it might not work if the architecture of the graphics card is too old. It is also not compatible with python 3.10 which was the version being worked on at the moment, it had to be switched to an environment with python 3.8 to avoid further issues.
-\\
-\input{Annex.tex}
 
 
 \section{Bibliography}
 \label{sec-bibliography}
 
 \printbibliography
+
+\input{Annex.tex}
 
 %\section*{Agraïments}
 

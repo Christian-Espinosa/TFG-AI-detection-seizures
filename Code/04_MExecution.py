@@ -80,7 +80,7 @@ else:
             test_data_x = dat.scalers_transform(scalers, test_data_x)
 
             #Train
-            train_dataset = EEG_Dataset(train_data_x, train_data_y[:,-1])
+            train_dataset = EEG_Dataset(train_data_x, train_data_y)
             train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
             model, avg_cost = dat.train_model(device, model, optimizer, criterion, train_dataloader, None, params["n_epochs"])
             if save_model:

@@ -29,14 +29,7 @@ def setBandwidth(dic, range, hz, elec = "FP1-F7"):
     print('{} to {} Plot'.format(range[0], range[1]))
     for k, v in dic.items():
         dic[k] = fra.butter_bandpass_filter(v ,range[0], range[1], hz, order=6)
-    plt.figure()
-    plt.plot(dic[elec], label='Filtered signal')
-    plt.xlabel('time (seconds)')
-    plt.grid(True)
-    plt.axis('tight')
-    plt.legend(loc='upper left')
-    plt.title('{} to {} Plot Electrode: {}'.format(range[0], range[1], elec))
-    plt.draw()
+       
 
     return dic
 
@@ -57,6 +50,19 @@ def check_23electrodes(f, name, c):
                     i = i+1
     return True
 
+def plotea(dic):
+    elec = 'FP1-F7'
+    plt.figure()
+    plt.plot(np.where(dic['seizure']==1, dic[elec], None), color="red", label="Seizure")
+    plt.plot(np.where(dic['seizure']==0, dic[elec], None), color="blue", label="No Seizure")
+    plt.legend()
+    plt.xlabel('time (seconds)')
+    plt.grid(True)
+    plt.axis('tight')
+    plt.legend(loc='upper left')
+    plt.title('Filtered data electrode: {}'.format(elec))
+    
+    plt.show()
 
 #%%
 
@@ -67,7 +73,7 @@ def check_23electrodes(f, name, c):
 # --> /CVC
 
 #Define Variables and Read edf
-single_execution = False
+single_execution = True
 
 #FILTERING FEATURES
 f_range = 'theta'
@@ -86,7 +92,7 @@ dic_cut = {'window' : 40, # window size seconds
 if single_execution:
     #%%
     n_subj = 1
-    file = 4
+    file = 3
     show_plots = True
 
     name_edf = "chb{:02.0f}_{:02.0f}".format(n_subj, file)
@@ -110,8 +116,9 @@ if single_execution:
     print('Time get edf: ', stop - start)  
     #%%
     #Define max BandWidth and Theta
-    dic = setBandwidth(dic, dic_band_definitions['maxrange'], hz)
+    #dic = setBandwidth(dic, dic_band_definitions['maxrange'], hz)
     dic = setBandwidth(dic, dic_band_definitions[f_range], hz)
+    
 
     # %%
     start = timeit.default_timer()
@@ -119,6 +126,7 @@ if single_execution:
         print("Subject electrodes wihout interruptions")
     
     dic = fra.setLabels(dic, file_summary, file)
+    
     if dic == None:
         print("Error in labeling!")
 
@@ -127,7 +135,8 @@ if single_execution:
     fra.saveToNumpy(path_parquet, path_numpy)
     
     if show_plots:
-        plt.show()
+        plotea(dic)
+        
     stop = timeit.default_timer()
     print('Time label and save: ', stop - start)  
 
