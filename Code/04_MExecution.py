@@ -81,7 +81,7 @@ else:
                 data_x = np.load(os.path.join(numpys,npys[file]), allow_pickle=True)
                 data_y = np.load(os.path.join(numpys,npys[file+1]), allow_pickle=True)
                 
-                train_data_x, train_data_y, test_data_x, test_data_y = dat.select_subject_train_test_data(data_x, data_y, 0.5)
+                train_data_x, train_data_y, test_data_x, test_data_y = dat.select_subject_train_test_data(data_x, data_y, 0.99)
                 print("data loaded and splitted")
 
                 # 1) Data normalization
