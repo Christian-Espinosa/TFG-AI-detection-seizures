@@ -6,7 +6,7 @@ import pandas as pd
 import sys
 import pickle
 import glob
-from datetime import date
+from datetime import datetime
 
 #NUMERIC
 import numpy as np
@@ -29,7 +29,6 @@ from  library.eeg_util_data import *
 
 #-----------Configure Data Set-----------
 path_model = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/trys")
-path_save_model =  os.path.abspath(path_model + "/" + date.today().strftime("%d/%m/%Y_%H%M%S") + ".pt")
 path_load_model = os.path.abspath(path_model + "/" + ""+ ".pt")
 
 
@@ -43,8 +42,8 @@ outputmodule_params['n_classes']=2
 
 #CUDA
 use_cuda = torch.cuda.is_available()
-#device = torch.device("cuda:0" if use_cuda else "cpu")
-device = torch.device("cpu")
+device = torch.device('cuda' if use_cuda else 'cpu')
+#device = torch.device("cpu")
 torch.backends.cudnn.benchmark = True
 
 # Parameters
@@ -54,38 +53,58 @@ params = {'batch_size': 750,
           'n_epochs': 1}#100
 criterion = nn.CrossEntropyLoss()
 model = CNN_ConcatInput(projmodule_params,convnet_params,outputmodule_params)
+model.to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr = 1e-4)
 
+save_model = True
+
+#check model?
 if False:
     dat.CheckModel(model, device)
 else:
-        
-    subj = 'chb01'
-    numpys = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
-    save_model = False
-    
-    for file in range(1,len(os.listdir(numpys))):
-        
-        #Load Data
-        filename_x = subj + "_{:02.0f}".format(file) + '_data_x.npy'
-        filename_y = subj + "_{:02.0f}".format(file) + '_data_y.npy'
-        if os.path.exists(os.path.join(numpys,filename_x)):
-            data_x = np.load(os.path.join(numpys,filename_x), allow_pickle=True)
-            data_y = np.load(os.path.join(numpys,filename_y), allow_pickle=True)
-            
-            train_data_x, train_data_y, test_data_x, test_data_y = dat.select_subject_train_test_data(data_x, data_y, 0.5)
-            
-            # 1) data normalization
-            train_data_x, scalers = dat.scalers_fit(train_data_x)
-            test_data_x = dat.scalers_transform(scalers, test_data_x)
 
-            #Train
-            train_dataset = EEG_Dataset(train_data_x, train_data_y)
-            train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
-            model, avg_cost = dat.train_model(device, model, optimizer, criterion, train_dataloader, None, params["n_epochs"])
+    #Train only/Test only
+    if True:
+
+        #Subjects
+        n_subjects = 1
+        for i in range(1,n_subjects+1):
+            subj = 'chb' + "{:02.0f}".format(i)
+            print("Subject: ", subj)
+            numpys = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
+            
+            #Numpys
+            npys = os.listdir(numpys)
+            for file in range(0,int(len(npys)),2):
+
+                print("Loading:".format(npys[file]))
+                data_x = np.load(os.path.join(numpys,npys[file]), allow_pickle=True)
+                data_y = np.load(os.path.join(numpys,npys[file+1]), allow_pickle=True)
+                
+                train_data_x, train_data_y, test_data_x, test_data_y = dat.select_subject_train_test_data(data_x, data_y, 0.5)
+                print("data loaded and splitted")
+
+                # 1) Data normalization
+                train_data_x, scalers = dat.scalers_fit(train_data_x)
+                test_data_x = dat.scalers_transform(scalers, test_data_x)
+
+                print("start Train...")
+                # 2) Train
+                train_dataset = EEG_Dataset(train_data_x, train_data_y)
+                train_dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
+                model, avg_cost = dat.train_model(device, model, optimizer, criterion, train_dataloader, None, params["n_epochs"])
+
+                print("Done!")
+                # 3) Save model
             if save_model:
-                torch.save(model, path_save_model)
+                torch.save(model, os.path.abspath(path_model + "/" + datetime.now().strftime("%d%m%Y_%H%M%S_") + subj + ".pt"))
+                print("Model Saved!")
 
+    else:
+        
+        torch.load(os.path.abspath(path_model + "/" + ".pt"))
+
+        for file in range(1,len(os.listdir(numpys)/2)):
             #Test
             test_dataset = EEG_Dataset(test_data_x, test_data_y)
             test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
@@ -95,8 +114,8 @@ else:
             #y_true ->  grountruth 0, 1 si es seizure o no
             #y_perd -> 0, 1 segun haya predicho el modelo
             #y_prob ->  probabilidades 
-            
-            report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
-            print(report)
-            
+        
+        report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
+        print(report)
+        
             

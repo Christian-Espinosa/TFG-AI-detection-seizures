@@ -6,6 +6,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pandas as pd
 from scipy.signal import butter, lfilter
+import matplotlib.pyplot as plt
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -85,9 +86,10 @@ def setLabels(dic, f, n, hz=256):
             elif lines[i].strip()[:-1] == "Number of Seizures in File: ":
                 for _ in range(int(lines[i].strip()[-1])):
                     i += 1
-                    ini = int(lines[i].strip()[:-8].replace('Seizure Start Time: ',''))*hz
+                    ini = [int(s) for s in lines[i].split() if s.isdigit()][-1]*hz
                     i += 1
-                    fi = int(lines[i].strip()[:-8].replace('Seizure End Time: ',''))*hz
+                    fi = [int(s) for s in lines[i].split() if s.isdigit()][-1]*hz
+                    
                     for x in range(ini, fi):
                         dic['seizure'][x] = 1
                 return dic
@@ -99,7 +101,7 @@ def saveToParquet(dic, path):
 def chunkData(path, dic_cut):
     
     eeg_df = pd.read_parquet(os.path.abspath(path))
-    print('Step 1. Split data, parquet loaded', eeg_df.shape)
+    print('Split data, parquet loaded', eeg_df.shape)
     print('Cutting signal...')
     df_windows = cut_signal_CHB(eeg_df,dic_cut)
     print('saving...')
@@ -159,9 +161,70 @@ def input_features(df):
                 
         
     # concatenate along the rows axis
+    #a = 22
+    #b = 2560
+    #c=0
+    #for i in range(len(data_x)):
+    #    for j in range(len(data_x[i])):
+    #        if b != len(data_x[i][j]):
+    #            print('ERROR a', i)
+    #            print('ERROR b', j)
+    #            print(len(data_x[i][j]))
+    #            c +=1
+    #print('errors ', c)
+    
 
-    data_x = np.stack(data_x, axis=0)
-    data_x = data_x.astype(np.float32)
+    #verifica que todas tengan el mismo valor
     data_y = np.stack(data_y, axis=0)
     
+    data_x = np.stack(data_x, axis=0)
+    data_x = data_x.astype(np.float32)
+    
     return data_x, data_y 
+
+
+def Rawplot1Channel(dic, elec = "FP1-F7"):
+    #Plot 1 electrode no filtering
+    print("Overall Plot")
+    plt.figure()
+    plt.plot(dic[elec])
+    plt.title("Raw Data")
+    plt.draw()
+
+def setBandwidth(dic, range, hz):
+    #sets bandwidth of all electrodes, prints one
+    for k, v in dic.items():
+        dic[k] = butter_bandpass_filter(v ,range[0], range[1], hz, order=6)
+
+    return dic
+
+def check_23electrodes(f, name, c):
+    with open(f, 'r') as file:
+        i=1
+        find = False
+        for l in file:
+            l = l.strip()
+            if i < 24:
+                if l == "Channel {}: {}".format(i, c[i-1]):
+                    find = True
+                else:
+                    if find and i>=1 and i<24:
+                        print("Electrodes are not ok in {}".format(name))
+                        return False
+                if find:
+                    i = i+1
+    return True
+
+def plotea(dic):
+    elec = 'FP1-F7'
+    plt.figure()
+    plt.plot(np.where(dic['seizure']==1, dic[elec], None), color="red", label="Seizure")
+    plt.plot(np.where(dic['seizure']==0, dic[elec], None), color="blue", label="No Seizure")
+    plt.legend()
+    plt.xlabel('time (seconds)')
+    plt.grid(True)
+    plt.axis('tight')
+    plt.legend(loc='upper left')
+    plt.title('Filtered data electrode: {}'.format(elec))
+    
+    

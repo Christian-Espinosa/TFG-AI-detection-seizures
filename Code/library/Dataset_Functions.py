@@ -146,7 +146,7 @@ def test_model(model, test_dataloader):
 def train_model(device, model, optimizer, criterion, train_dataloader, valid_dataloader,
                 n_epochs, verbose=1, save_path='./pretrained/model.pt',
                 best_val_loss=None):
-
+    model.to(device)
     if best_val_loss is None:
         best_val_loss = float("Inf")
 
@@ -206,7 +206,7 @@ def train_model(device, model, optimizer, criterion, train_dataloader, valid_dat
 
 
 def test_model(device, model, test_dataloader):
-
+    model.to(device)
     total_test_batch = len(test_dataloader)
 
     y_true = []
