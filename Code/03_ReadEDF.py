@@ -104,13 +104,13 @@ else:
 
 
     # %%
-    n_subjects = 10
+    n_subjects = 16
     show_plots = False
     print("Start {} subjects".format(n_subjects))
     start = timeit.default_timer()
 
     #For every subject
-    for i in range(1,n_subjects+1):
+    for i in range(13,n_subjects+1):
 
         subj = "chb{:02.0f}".format(i)
         summary = subj + "-summary"

@@ -218,7 +218,7 @@ def test_model(device, model, test_dataloader):
         for k in range(total_test_batch):
             seqs, targets = next(iter_test_dataset)
             seqs, targets = seqs.to(device), targets.to(device)
-            print("seqs: ",seqs)
+            #print("seqs: ",seqs)
             outputs = model(seqs)
             pred = outputs.max(1, keepdim=True)[1].cpu().numpy()
             probs = torch.softmax(outputs,dim=1)
