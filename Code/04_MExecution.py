@@ -166,12 +166,6 @@ else:
     else:
         model = torch.load(os.path.abspath(path_model + "/" + "30012022_055520_chb09_chb09_19_data_x" + ".pt"))
         model.to(device)
-
-        #Set Test Subject
-        test_subject = 13
-        subj = 'chb' + "{:02.0f}".format(test_subject)
-        print("Test Subject: ", subj)
-        numpys = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
         
         #Set Reference normalization
         subj_tr = 'chb' + "{:02.0f}".format(9)
@@ -180,32 +174,40 @@ else:
         train_data_x = np.load(os.path.join(path_tr,numpy_tr), allow_pickle=True)
         train_data_x, scalers = dat.scalers_fit(train_data_x)
 
-        #Numpys
-        npys = os.listdir(numpys)
-        for file in range(0,int(len(npys)),2):
-
-            print("Loading: {}".format(npys[file]))
-            data_x = np.load(os.path.join(numpys,npys[file]), allow_pickle=True)
-            data_y = np.load(os.path.join(numpys,npys[file+1]), allow_pickle=True)
-            
-            _ , _ , test_data_x, test_data_y = dat.select_subject_train_test_data(data_x, data_y, 0)
-
-            test_data_x = dat.scalers_transform(scalers, test_data_x)
-
-            #Test
-            test_dataset = EEG_Dataset(test_data_x, test_data_y)
-            test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
-            print("Testing model...", )
-            y_true, y_pred, y_prob = dat.test_model(device, model, test_dataloader)
-            print("Done!")
-            #y_true ->  grountruth 0, 1 si es seizure o no
-            #y_perd -> 0, 1 segun haya predicho el modelo
-            #y_prob ->  probabilidades 
+        #Set Test Subject
+        n_subjects = 16
         
-            report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
-            pd.DataFrame.from_dict(report).to_parquet(os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/results/' + npys[file][:-4] + '.parquet'))
+        for i in range(13,n_subjects+1):
+            subj = 'chb' + "{:02.0f}".format(i)
+            print("Test Subject: ", subj)
+            numpys = os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/numpy/')
 
-            print(report)
+            #Numpys
+            npys = os.listdir(numpys)
+            for file in range(0,int(len(npys)),2):
+
+                print("Loading: {}".format(npys[file]))
+                data_x = np.load(os.path.join(numpys,npys[file]), allow_pickle=True)
+                data_y = np.load(os.path.join(numpys,npys[file+1]), allow_pickle=True)
+                
+                _ , _ , test_data_x, test_data_y = dat.select_subject_train_test_data(data_x, data_y, 0)
+
+                test_data_x = dat.scalers_transform(scalers, test_data_x)
+
+                #Test
+                test_dataset = EEG_Dataset(test_data_x, test_data_y)
+                test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=params["batch_size"], shuffle=params["shuffle"])
+                print("Testing model...", )
+                y_true, y_pred, y_prob = dat.test_model(device, model, test_dataloader)
+                print("Done!")
+                #y_true ->  grountruth 0, 1 si es seizure o no
+                #y_perd -> 0, 1 segun haya predicho el modelo
+                #y_prob ->  probabilidades 
+            
+                report = metrics.classification_report(y_true, y_pred, zero_division=0, output_dict=True)
+                pd.DataFrame.from_dict(report).to_parquet(os.path.abspath(os.path.join(os.getcwd(), os.pardir) + "/DataSetTFG/CHB-MIT/" + subj + '/results/' + npys[file][:-4] + '.parquet'))
+
+                print(report)
         
 stop = timeit.default_timer()
 print('Time: ', stop - start)
