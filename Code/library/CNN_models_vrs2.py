@@ -87,7 +87,7 @@ class CNN_ConcatInput(nn.Module):
         
         ## convolutional block for temporal signal processing
         n_features = 16 #això és temporal. En aquesta ocasió el bloc convolucional està fixat, caldrà canviar-ho més endavant
-        self.temp_net=ConVNet(n_features,convnet_params['kernel_size'])
+        self.temp_net=ConVNet(n_features, convnet_params['kernel_size'])
                     
         ## output block: projection, fc layers and classifier
         ### classification fc layer
@@ -152,23 +152,18 @@ class CNN_ProjOut_Conv(nn.Module):
     Projection based on convolutions
 
     """
-    def __init__(self, n_nodes=14, n_classes=2,n_features= 16):
+    def __init__(self, projmodule_params,convnet_params,outputmodule_params):
         super().__init__()
 
         print('\tRunning class: ', self.__class__.__name__)
+        ### PARAMETERS 
+        self.projmodule_params=projmodule_params
+        self.convnet_params=convnet_params
+        self.outputmodule_params=outputmodule_params
         
-        #### PARAMETERS
-        #  projection parameter: temporal signal output 
+        n_features= 16
         self.signalout_kernel_dim = 4
-        # convoluttion block parameters
-        
-        # classifier parameters
-        
-        ##### ARCHITECTURE
-        ## input block: projection (None)
-        
-        ## convolutional block: temporal signal net
-        self.temp_net=ConVNet(n_features,(1,3))
+        self.temp_net=ConVNet(n_features,convnet_params['kernel_size'])
         
         ## Output Block
         ### projection of output signal channels
@@ -177,14 +172,14 @@ class CNN_ProjOut_Conv(nn.Module):
             nn.Conv2d(last_block[0].out_channels, n_features * 4, kernel_size=(1,1), stride=(1,1)),
             nn.Dropout(0.1),
             nn.ReLU(inplace=True),
-            nn.Conv2d(n_features * 4, n_features * 4, kernel_size=(n_nodes,1), stride=(1,1)),
+            nn.Conv2d(n_features * 4, n_features * 4, kernel_size=(convnet_params['Nneurons'],1), stride=(1,1)),
             nn.Dropout(0.1),
             nn.ReLU(inplace=True),
             
             )
 
         ### classification fc layer
-        self.fc_out = nn.Linear(n_features * 4 * self.signalout_kernel_dim, n_classes)
+        self.fc_out = nn.Linear(n_features * 4 * self.signalout_kernel_dim, outputmodule_params['n_classes'])
 
         # weight init
         init_weights_xavier_normal(self)
@@ -192,14 +187,12 @@ class CNN_ProjOut_Conv(nn.Module):
     def forward(self, x):
 
         # input is (N, NChannels, L)
-        
         ## Input Signal Projection: None
-        
-
         ## Convolutional Block: temporal signal features
         #Trick to use conv2d operator instead of conv1
         x = torch.unsqueeze(x, dim=1) # (N, 1, NChannels, L)
-        x = self.temp_net(x) # [N, NNeurons, NChannels, L']
+        for layer in self.temp_net:
+            x = layer(x) # [N, 1,1,NNeurons]
         
         ## Output Block
         ### projection of output channels
@@ -230,20 +223,26 @@ class CNN_ProjOut_Concat(nn.Module):
     Input data is [N, features=14, timestep=40]
     """
 
-    def __init__(self, n_nodes=14, n_classes=2, n_features= 16,n_features_out=50):
+    def __init__(self, projmodule_params,convnet_params, outputmodule_params):
         super().__init__()
 
-        print('running class ', self.__class__.__name__)
+        print('\tRunning class: ', self.__class__.__name__)
+        ### PARAMETERS 
+        self.projmodule_params=projmodule_params
+        self.convnet_params=convnet_params
+        self.outputmodule_params=outputmodule_params
+        
 
-      
-        # conv block parameters
-        ker_temp = (1,3) # kernel for temporal dim
-        #  temporal signal output projection parameter
-            
         self.avg_pool_kernel_stride = 2
+        n_nodes=1
+        
         
         ## temporal signal net
-        self.temp_net=ConVNet(n_features,ker_temp)
+        n_features= 16
+        n_features_out=50
+        
+        
+        self.temp_net=ConVNet(n_features, convnet_params['kernel_size'])
         
         
         ## projection of output channels
@@ -258,7 +257,7 @@ class CNN_ProjOut_Concat(nn.Module):
             )
         
         # classifier
-        self.fc_out = nn.Linear(n_features_out, n_classes)
+        self.fc_out = nn.Linear(n_features_out, outputmodule_params['n_classes'])
 
         # weight init
         init_weights_xavier_normal(self)
@@ -268,8 +267,8 @@ class CNN_ProjOut_Concat(nn.Module):
 
         x = torch.unsqueeze(x, dim=1) # (N, 1, NChannels, L)
 
-        ## temporal features
-        x = self.temp_net(x) # (N, NNeurons, NChannels, L')
+        for layer in self.temp_net:
+            x = layer(x) 
 
         ## output channel projection
         # to become invariant to input length
