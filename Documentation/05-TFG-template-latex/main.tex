@@ -9,7 +9,10 @@
 \usepackage{multirow}
 \usepackage{lettrine}
 \usepackage[top=2cm, bottom=1.5cm, left=2cm, right=2cm]{geometry}
-\usepackage[figurename=Fig.,tablename=TAULA]{caption}
+\usepackage[figurename=Fig.,tablename=TABLE]{caption}
+
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{tabularx}
 
 \usepackage{biblatex}
 \addbibresource{ref.bib}
@@ -35,10 +38,10 @@
 
 \begin{document}
 \nocite{*}
-\fancyhead[LO]{\scriptsize AUTOR: TÍTOL DEL TREBALL}
+\fancyhead[LO]{\scriptsize AUTOR: Christian Espinosa Reboredo}
 \fancyhead[RO]{\thepage}
 \fancyhead[LE]{\thepage}
-\fancyhead[RE]{\scriptsize EE/UAB TFG INFORMÀTICA: TÍTOL (ABREUJAT SI ÉS MOLT LLARG)}
+\fancyhead[RE]{\scriptsize EE/UAB TFG INFORMÀTICA: Recognition of epileptic seizures from EEG data}
 
 \fancyfoot[CO,CE]{}
 
@@ -81,12 +84,7 @@
 %\begin{abstract}
 %\bigskip
 %\\
-\textbf{Abstract--}An electroencephalogram (EEG) is a test that detects electrical activity of the brain. Since 
-1924 this procedure has been done countless times to obtain brain activity. This paper tries to go a step further 
-to understand electroencephalography better using deep learning algorithms. The data used in this paper is a public 
-dataset CHB-MIT\cite{goldberger2000physiobank} of recordings of paediatric subjects with intractable seizures. Different methods of data management 
-are done and documented to make the most of the algorithms used. The objective is to train an algorithm to acknowledge 
-when the subject is having a seizure.
+\textbf{Abstract--}An electroencephalogram (EEG) is a test that detects electrical activity of the brain. This paper tries to go a step further to interpret seizures from electroencephalograms using deep learning algorithms. The data used in this paper is a public dataset CHB-MIT\cite{goldberger2000physiobank} of recordings of paediatric subjects with intractable seizures. Different methods of data processing are done and documented to make the most of the algorithms used as well as the strategy. The objective is to train an algorithm to classify when the subject is having a seizure and when it’s not.
 \\
 \\
 \textbf{Keywords-- }electroencephalogram, deep learning, brain activity, classification, EEG analysis\\
@@ -104,14 +102,14 @@ when the subject is having a seizure.
 %\end{abstract}
 \end{@twocolumnfalse}]
 
-\blfootnote{$\bullet$ E-mail de contacte: 1459024 @uab.cat}
+\blfootnote{$\bullet$ E-mail de contacte: 1459024@uab.cat}
 \blfootnote{$\bullet$ Menció realitzada: Computació }
 \blfootnote{$\bullet$ Treball tutoritzat per: Aura Hernández Sabaté (Ciencies de la Computació)}
 \blfootnote{$\bullet$ Curs 2021/22}
 
 \section{Introduction}
 \leavevmode\\
-\lettrine[lines=3]{A}{n} epileptic seizure is a period of symptoms due to abnormally excessive or synchronous neuronal activity in the brain. This can cause different effects like uncontrolled shaking movements involving much of the body, parts of the body or subtle momentary loss of awareness. In order to understand this issue, it is important to understand how neurons work and interact with each other to conserve what we call consciousness represented as brain activity and brainwaves. 
+\lettrine[lines=3]{A}{n} epileptic seizure is a period of symptoms due to abnormally excessive or synchronous neuronal activity in the brain. This can cause different effects like uncontrolled shaking movements involving much of the body, parts of the body or subtle momentary loss of awareness. In order to understand this issue, it is important to understand how neurons work and interact with each other to conserve what we call consciousness represented as brain activity and brainwaves.
 \\\\
 Neural oscillations are rhythmic or repetitive patterns of neural activity in the central nervous system which can be driven by mechanisms within individual neurons or by interactions. Since 1824 neural oscillations have been observed, fifty years later intrinsic oscillatory behaviour was encountered in vertebrate neurons, but the purpose of these is yet to be fully understood.
 \\\\
@@ -123,7 +121,7 @@ In this TFG we detail the complete process of epileptic seizure detection, from 
 \input{related_work.tex}
 \input{objectives.tex}
 \input{methods.tex}
-
+\input{final.tex}
 
 
 \section{Bibliography}
