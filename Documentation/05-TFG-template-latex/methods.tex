@@ -2,14 +2,22 @@
 \subsection{Dataset}
 The dataset is data collected from the Children’s Hospital Boston, consisting in EEG recordings of subjects with intractable seizures. The folders classify in 23 cases from 22 subjects (case chb21 and chb1 are the same but 1.5 years apart). The subject’s personal information gender and age is in a separate file called SUBJECT-INFO added in this paper as subject\_info.csv.
 \\\\
-Each case contains between 9 and 42 edf files. There are edf files of EEG signals without seizures and others with recordings of seizures, these defined in RECORDS-WITH-SEIZURES. The files with seizures have the extension edf.seizures which disables the possibility of accessing the file with a normal edf reader library.
+Each case contains between 9 and 42 edf files. There are edf files of EEG signals without seizures and others with recordings of seizures, these defined in RECORDS-WITH-SEIZURES. The files with seizures have the extension edf.seizures which disables the possibility of accessing the file with a normal edf reader library. The seizure data can be read from the summary file.
+\\
+\begin{figure}[h!]
+  \caption{The international 10-20 system defining electrodes position seen from different views}
+  \centering
+  \includegraphics[width=0.5\textwidth]{img/electrodesposiiton.png}
+\end{figure}
+\\
+Most cases have 1 hour of EEG recordings, but some have 1 to 4 hours depending on the case, split between 9 to 42 edf recordings, recorded at 256Hz in 16 bit resolution. The position of the electrodes as well as the nomenclature are in the International 10-20 system.
 \\\\
-Most cases have 1 hour of EEG recordings, but some have 1 to 4 hours depending on the case, split between 9 to 42 edf recordings, recorded at 256Hz in 16 bit resolution. It’s important to note, some subjects had hardware interruptions while the recording of the EEG, and so when there is an interruption, it’s noted in the summary.txt file. This kind of interruptions are a problem to get information normally, because the disposition of the electrodes change making it harder to control the disposition of the electrodes and the EEG might not work for a sequential approach, for example, if it’s important there is hypothetically an order on how a seizure comes to be, this file would certainly be discarded. To take into account this file the script to process the data in this TFG should be programmed to do so. For now, the objective is different, this project just classifies if there is or not a seizure, but for further development it should be considered. The data base is very large containing enough uninterrupted data to work with.
+It’s important to note, some subjects had hardware interruptions while the recording of the EEG, and so when there is an interruption, it’s noted in the summary.txt file. This kind of interruptions are a problem to get information normally, because the disposition of the electrodes change making it harder to control the disposition of the electrodes and the EEG might not work for a sequential approach, for example, if it’s important there is hypothetically an order on how a seizure comes to be, this file would certainly be discarded. To take into account this file the script to process the data in this TFG should be programmed to do so. For now, the objective is different, this project just classifies if there is or not a seizure, but for further development it should be considered. The data base is very large containing enough uninterrupted data to work with.
 \\\\
-The data used to train the model in this TFG is data from subject 1 to subject 10. Also only few .edf in each subject’s folders have any seizure. If every .edf was used, there would be a lot of data labelled as not seizure than seizure data, so from each subject only the files with seizure are used. Even so, handling only files with seizures the dataset is unbalanced, so for future development two strategies should be considered:
-
+The data used to train the model in this TFG is data from subject 1 to subject 10. Also, only few edf in each subject’s folders have any seizure. If every edf was used, there would be a lot more data labelled as not seizure than seizure data, so from each subject only the files with seizures are used. Even so, handling only files with seizures the dataset is still unbalanced, so for future development two strategies should be considered:
+\\
 \begin{itemize}
-  \item Files should be cut to have a balance of labelled data of 50\% data with seizure and 50\% data without. This strategy could end up un subsampling, considering there are few seizures in the hole dataset.
+  \item Files should be cut to have a balance of labelled data of 50\% data with seizure and 50\% data without. This strategy could end up in subsampling, considering there are few seizures in the hole dataset.
   \item When training the model, the criteria of cross Entropy should be weighted. To consider no seizure less important than seizure data.
 \end{itemize}
 \leavevmode\\
@@ -36,7 +44,7 @@ With this, all the parquets and arrays are specifically saved and ordered to ens
 \begin{figure}[h!]
     \caption{Filtered data in Theta range from electrode FP1-F7, subject 1 file 3}
     \centering
-    \includegraphics[width=0.5\textwidth]{img/seizurenoseizure.png}
+    \includegraphics[width=0.5\textwidth]{img/all in one.png}
 \end{figure}
 
 \leavevmode\\
@@ -60,11 +68,11 @@ Once all desired raw data is filtered and saved, the second script to execute is
 \end{itemize}
 \leavevmode\\
 \\
-The script uses numpy arrays as input data stored as previously mentioned in data\_x and data\_y. These files depending on the strategy of the script can be processed one last time to ensure good results from the classification. In this TFG data when loaded uses the strategy stated previously as phase 1 and 2, for training and testing. But the script has the option to split the files in train and test by a percentage variable. For the executions done this variable is set to 1 (100\%) on training, and 0 on testing phase.
+The script uses numpy arrays as input data stored as previously mentioned in data\_x and data\_y. These files depending on the strategy of the script can be processed one last time to ensure good results from the classification. In this TFG data when loaded uses the strategy stated previously as phase 1 and 2, for training and testing. But the script has the option to split the files in train and test by a percentage variable. For the executions done this variable is set to 1 (100\%) on training, and 0 on testing phase to consider all the data from the file for the purpose of training or testing.
 \\\\
-During the implementation of this script, a lot of problems of dependency on critical libraries has happened. Starting by cuda, for faster results it is used in all models, but it might not work if the architecture of the graphics card is too old. It is also not compatible with python 3.10 which was the version being worked on at the moment, it had to be switched to an environment with python 3.8 to avoid further issues. The script will be executed with cuda if the libraries are available, if not it will automatically work with the CPU.
+During the implementation of this script, a lot of problems of dependency on critical libraries has happened. Starting by cuda, for faster results it is used in all models, but it might not work if the architecture of the graphics card is too old. It is also not compatible with python 3.10 which was the version being worked on at the moment, it had to be switched to an environment with python 3.8 to avoid further issues. The script will be executed with cuda if the libraries are available as well as the drivers, if not it will automatically work with the CPU.
 \\\\
-When it’s time to save the model, it’s saved in a folder called “trys” in the root directory, like if it was another subject but it only contains pt files, ordered in it by the date of execution.
+When it’s time to save the model, it’s saved in a folder called “trys” in the root directory, like if it was another subject but it only contains pt files. The name of the file is automatically created defined by the last subject and file executed, as well as the date considering day, month, year, hour, minute and second when the file got saved. Seconds where necessary to save in the name as well to prevent models from overwriting if it had to be saved in the same minute because of low epoch training.
 \\\\
 The models used in the TFG have similar structures. The first one CNN\_ConcatInput and the second one CNN\_ProjOut\_Conv. As the names suggest these models are Convolutional Neural Networks. Both models have 3 base layers of convolution defined by a function ConVNet which defines 3 different layers using torch, the first one being 16@22x19. The first parameter as number of input features defined by a constant variable defined in the constructor of the model, the second parameter defines the size of the data, 22 being the channels, in this case 
 \\
