@@ -9,7 +9,11 @@
 \usepackage{multirow}
 \usepackage{lettrine}
 \usepackage[top=2cm, bottom=1.5cm, left=2cm, right=2cm]{geometry}
-\usepackage[figurename=Fig.,tablename=TAULA]{caption}
+\usepackage[figurename=Fig.,tablename=TABLE]{caption}
+
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{tabularx}
+\usepackage{float}
 
 \usepackage{biblatex}
 \addbibresource{ref.bib}
@@ -18,7 +22,7 @@
 
 \author{\LARGE\sffamily Christian Espinosa Reboredo}
 \title{\Huge{\sffamily Recognition of epileptic seizures from EEG data}}
-\date{}
+\date{07/02/2022}
 
 \newcommand\blfootnote[1]{%
   \begingroup
@@ -35,10 +39,10 @@
 
 \begin{document}
 \nocite{*}
-\fancyhead[LO]{\scriptsize AUTOR: TÍTOL DEL TREBALL}
+\fancyhead[LO]{\scriptsize AUTOR: Christian Espinosa Reboredo}
 \fancyhead[RO]{\thepage}
 \fancyhead[LE]{\thepage}
-\fancyhead[RE]{\scriptsize EE/UAB TFG INFORMÀTICA: TÍTOL (ABREUJAT SI ÉS MOLT LLARG)}
+\fancyhead[RE]{\scriptsize EE/UAB TFG INFORMÀTICA: Recognition of epileptic seizures from EEG data}
 
 \fancyfoot[CO,CE]{}
 
@@ -46,7 +50,7 @@
 {
    \fancyhf{}
    \fancyhead[L]{\scriptsize TFG EN ENGINYERIA INFORMÀTICA, ESCOLA D'ENGINYERIA (EE), UNIVERSITAT AUTÒNOMA DE BARCELONA (UAB)}
-   \fancyfoot[C]{\scriptsize ``Mes'' de 20xx, Escola d'Enginyeria (UAB)}
+   \fancyfoot[C]{\scriptsize Febrer de 2022, Escola d'Enginyeria (UAB)}
 }
 
 %\lhead{\thepage}
@@ -74,22 +78,16 @@
 \begin{center}
 \parbox{0.915\textwidth}
 {\sffamily
-%\textbf{Resum--}
-
-%\end{abstract}
-%\bigskip
-%\begin{abstract}
-%\bigskip
-%\\
-\textbf{Abstract--}An electroencephalogram (EEG) is a test that detects electrical activity of the brain. Since 
-1924 this procedure has been done countless times to obtain brain activity. This paper tries to go a step further 
-to understand electroencephalography better using deep learning algorithms. The data used in this paper is a public 
-dataset CHB-MIT\cite{goldberger2000physiobank} of recordings of paediatric subjects with intractable seizures. Different methods of data management 
-are done and documented to make the most of the algorithms used. The objective is to train an algorithm to acknowledge 
-when the subject is having a seizure.
+\textbf{Abstract--}An electroencephalogram (EEG) is a test that detects electrical activity of the brain. This paper tries to go a step further to interpret seizures from electroencephalograms using deep learning algorithms. The data used in this paper is a public dataset CHB-MIT\cite{bbddCHBMIT} of recordings of paediatric subjects with intractable seizures. Different methods of data processing are done and documented to make the most of the algorithms used as well as the strategy. The objective is to train an algorithm to classify when the subject is having a seizure and when it is not.
 \\
 \\
 \textbf{Keywords-- }electroencephalogram, deep learning, brain activity, classification, EEG analysis\\
+\bigskip
+\\
+\textbf{Resumen--}Un electroencefalograma (EEG) es una prueba que detecta la actividad eléctrica del cerebro. Este artículo intenta dar un paso más para interpretar los ataques epilépticos a partir de electroencefalogramas utilizando algoritmos de aprendizaje computacional. Los datos utilizados en este documento son de una base de datos pública CHB-MIT\cite{bbddCHBMIT} de EGG de sujetos pediátricos con convulsiones intratables. Se realizan y documentan diferentes métodos de procesamiento de datos para aprovechar al máximo los algoritmos utilizados, así como la estrategia. El objetivo es entrenar un algoritmo para clasificar cuándo el sujeto está teniendo un ataque epiléptico y cuándo no.
+\\
+\\
+\textbf{Palabras clave-- }electroencefalograma, aprendizaje computacional, actividad cerebral, clasificación, análisis EEG\\
 }
 
 \bigskip
@@ -104,34 +102,35 @@ when the subject is having a seizure.
 %\end{abstract}
 \end{@twocolumnfalse}]
 
-\blfootnote{$\bullet$ E-mail de contacte: 1459024 @uab.cat}
-\blfootnote{$\bullet$ Menció realitzada: Computació }
-\blfootnote{$\bullet$ Treball tutoritzat per: Aura Hernández Sabaté (Ciencies de la Computació)}
-\blfootnote{$\bullet$ Curs 2021/22}
+\blfootnote{$\bullet$ E-mail of contact: 1459024@uab.cat}
+\blfootnote{$\bullet$ Degree Specialisation taken: Computació }
+\blfootnote{$\bullet$ Work supervised by: Aura Hernández Sabaté (Ciencies de la Computació)}
+\blfootnote{$\bullet$ Year 2021/22}
 
 \section{Introduction}
 \leavevmode\\
-\lettrine[lines=3]{A}{n} epileptic seizure is a period of symptoms due to abnormally excessive or synchronous neuronal activity in the brain. This can cause different effects like uncontrolled shaking movements involving much of the body, parts of the body or subtle momentary loss of awareness. In order to understand this issue, it is important to understand how neurons work and interact with each other to conserve what we call consciousness represented as brain activity and brainwaves. 
+\lettrine[lines=3]{A}{n} epileptic seizure is a period of symptoms due to abnormally excessive or synchronous neuronal activity in the brain. This can cause different effects like uncontrolled shaking movements involving much of the body, parts of the body or subtle momentary loss of awareness. In order to understand this issue, it is important to understand how neurons work and interact with each other to conserve what we call consciousness, represented as brain activity and brainwaves.
 \\\\
 Neural oscillations are rhythmic or repetitive patterns of neural activity in the central nervous system which can be driven by mechanisms within individual neurons or by interactions. Since 1824 neural oscillations have been observed, fifty years later intrinsic oscillatory behaviour was encountered in vertebrate neurons, but the purpose of these is yet to be fully understood.
 \\\\
-As the main objective is to classify seizures from brain activity first of all, it will be needed an inside view on how the brain works to have a hint on how and what is done to extract or intercept information from the neurons to process externally in a computer. This information is available annexed in this paper just to have an overview to further understand the subject, but this matter is not the main purpose of this paper as it specifies in data processing, architecture, model strategies and classification results.
+The main objective of this paper is to classify seizures from brain activity by building a deep learning architecture. First of all, it will be needed an inside view on how the brain works to have a hint on how and what is done to extract or intercept information from the neurons to process externally in a computer. This information is available annexed in this paper to have an overview to further understand the subject. This matter is not the main purpose of this paper as the work involves data processing, architecture, model strategies and classification results.
 \\\\
-In this TFG we detail the complete process of epileptic seizure detection, from data processing to seizure recognition. Because this TFG works as a pipeline of different stages, an insight view of each is done, starting from data processing from a well-known database (CHB-MIT) of encephalograms collected from 23 subject with interactable seizures that has been used in previous research. Followed by the strategy of the architecture used to classify the signals to finally understand the classified results into seizure and not seizure.
-\\
+In this paper it is detailed the complete process of epileptic seizure detection, from data processing to seizure recognition. This study works as a pipeline of different stages. Therefore, an insight view of each one is done, starting from data processing from a well-known database CHB-MIT of encephalograms collected from 23 subjects with interactable seizures that has been used in previous research. Then followed by the strategy of the architecture used to classify the signals to finally understand the classified results into seizure and not seizure.
+\\\\
+There have been many other studies about seizure recognition, so in this project another approach is conducted to further study this subject. Before starting the study, an overview of different similar projects has been done. As acknowledgement, the scripts written in this paper have been supervised by the team at Computer Vision Centre (CVC) which are working on a project related to this paper.
 
-\input{related_work.tex}
-\input{objectives.tex}
-\input{methods.tex}
 
+\input{1related_work.tex}
+\input{2objectives.tex}
+\input{3methods.tex}
+\input{4final.tex}
 
 
 \section{Bibliography}
-\label{sec-bibliography}
 
 \printbibliography
 
-\input{Annex.tex}
+\input{5Annex.tex}
 
 %\section*{Agraïments}
 

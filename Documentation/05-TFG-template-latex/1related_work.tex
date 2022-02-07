@@ -1,0 +1,49 @@
+\section{Related Work}
+A lot of research has been made of the brain, to further understand its capabilities using deep learning algorithms. EEG signals can be used in many ways, such as the ones below. These studies, work on similar objectives of mental workload, seizure classification, attempting to understand and process EEG data, using deep learning techniques to develop frameworks to combine and process these signals.
+\\
+\subsection{Mental Workload Detection based on EEG Analysis}
+\leavevmode\\ 
+A study of mental workload\cite{relatedwork0} is done in order to work more efficiently, healthier and to avoid accidents since workload compromises both performance and awareness on the human. The use of EEG signals has a high correlation with specific cognitive and mental states such as workload, proposing a binary neural network to classify EEG features across different mental workloads.
+\\\\
+Mental workload is defined as “the cognitive and psychological effort to conclude a task”, observing that depending if workload is too heavy or too light it can affect human performance. 
+\\\\
+There are two main categories to measure workload:
+\\
+\begin{itemize}
+\item \textbf{Subjective measures:} Being the most used to asses mental workload, the NASA Task Load Index (TLX)\cite{tlx} a prominent way to gain insight on perceived workload from the subject based on a weighted average of six sub-variables: mental demand, physical demand, temporal demand, performance, effort and frustration. 
+\item \textbf{Physiological measures:} Providing a more reliable data by measuring physiological dynamic changes which cannot be controlled consciously, so that is why it’s more reliable. Readings such as electrocardiogram (ECG), electromyograph, electroencephalogram (EEG)... The combination of inputs reports better accuracy than the analysis if each one independently.
+\end{itemize}
+
+\leavevmode\\
+The approach of the mental workload detection based on EEG analysis study is to investigate the ability of one dimensional convolutional neural network (1D-CNN)\cite{CNN} models to recognise two types of mental load from EEG signals and to generalise the model to a population that has not been take into account in the training set. N-back test (memory demanding games requiring the resolution of simple arithmetic operations adjusting workload) is used to induce low and medium workload and to classify a simple neural network (NN) trained using only the power spectrum of theta waves.
+\\\\
+The method to obtain data started by having the sixteen subjects to watch a 10-minute relaxing video. Then, perform the N-back-test low, medium and high difficulty tests. Finally, subjects fill in a TLX questionnaire for subjective perception of the test difficulty and workload.
+\\\\
+To obtain the data, EEG recordings were done using an EMOTIV EPOC+ headset which has 14 electrodes placed according to the 10/20 system, which provides raw data and power spectrum for the main brain rhythms (theta, alpha, beta low, beta high), at 128 Hz and 8 Hz, respectively. 
+\\\\
+The study concluded with the following results, reported 95\% confidence interval for each class computed for all subjects and recall above 90\%. It is suggested to use longer windows to capture EEG non stationary nature.
+\\
+
+
+\subsection{EEG Signal Dimensionality Reduction And Classification Using Tensor Decomposition And Deep Convolutional Neural Networks}
+\leavevmode\\
+This study, EEG Signal Dimensionality Reduction and Classification Using Tensor Decomposition and Deep Convolutional Neural Networks\cite{relatedwork1} has the same objective of seizure classification. It is the only project I have been able to find using the same dataset CHB-MIT. The study uses convolutional networks (CNN) but with different architectures.
+\\\\
+Using convolutional neural networks (CNNs), still suffer from high dimensionality of the training data. The proposed tensor decomposition-based dimensionality reduction algorithm transforms a large set of slices of the input tensor to a concise set of slices which are called super-slices which handles the artifacts and redundancies of the EEG data and also reduces the dimension of the CNNs training inputs. This proposed framework is tested on HCB-MIT data and as results show, the approach outperforms other previous studies.
+\\
+
+
+\subsection{Epileptic Seizures Detection Using Deep Learning Techniques: A Review}
+\leavevmode\\
+The development of deep learning algorithms in many areas of medicine, such as in the diagnosis of epileptic seizures, has made significant advances.
+\\\\
+In this study Epileptic Seizures Detection Using Deep Learning Techniques\cite{relatedwork2}, a comprehensive overview of works focused on automated epileptic seizure detection using deep learning techniques and neuroimaging modalities is presented. Various methods proposed to diagnose epileptic seizures automatically using EEG and MRI modalities are described. In addition, rehabilitation systems developed for epileptic seizures using deep learning have been analysed, and a summary is provided. The rehabilitation tools include cloud computing techniques and hardware required for implementation of deep learning algorithms. Challenges, advantages and limitations in employing deep learning-based techniques for epileptic seizures diagnosis are presented as well as the most promising models and future works on automated epileptic seizure detection.
+\\
+
+
+\subsection{Recognition of mental workload of pilots in the cockpit using EEG signals}
+\leavevmode\\
+The commercial flightdeck is a naturally multi-tasking work environment and so automatic characterization of pilot’s workload becomes essential. Electroencephalogram (EEG) signals have shown a high correlation to specific cognitive and mental states like workload. However, there is not enough evidence in the literature to validate how well models generalize in case of new subjects performing tasks of a workload similar to the ones included during model’s training.
+\\\\
+In this paper Recognition of mental workload of pilots in the cockpit using EEG signals\cite{relatedwork3} it is proposed a convolutional neural network to classify EEG features across different mental workloads in a continuous performance task test that measures a portion of working memory and working memory capacity. The goal of this paper is to characterize the mental workload of flying pilots in the cockpit from the analysis of EEG signals. The model proposed is valid at a general population level and it is able to transfer task learning to a pilot mental workload recognition in a simulated operational environment.
+\\
