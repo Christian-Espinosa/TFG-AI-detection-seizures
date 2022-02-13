@@ -215,16 +215,23 @@ def check_23electrodes(f, name, c):
                     i = i+1
     return True
 
-def plotea(dic):
+def plotea(dic, n_subj, file):
     elec = 'FP1-F7'
-    plt.figure()
+    
     plt.plot(np.where(dic['seizure']==1, dic[elec], None), color="red", label="Seizure")
     plt.plot(np.where(dic['seizure']==0, dic[elec], None), color="blue", label="No Seizure")
+    
     plt.legend()
+    plt.margins(x=0)
+    #plt.xticks(np.arange(0, len(dic[elec]), 256))
+    l, r = plt.xlim()
+    plt.xlim(0, r/256)
+    plt.locator_params(axis='x', nbins=10)
     plt.xlabel('time (seconds)')
+    plt.ylabel('uV')
     plt.grid(True)
     plt.axis('tight')
     plt.legend(loc='upper left')
-    plt.title('Filtered data electrode: {}'.format(elec))
+    plt.title('Filtered data electrode {} from subject {} file {}'.format(elec, n_subj, file))
     
     

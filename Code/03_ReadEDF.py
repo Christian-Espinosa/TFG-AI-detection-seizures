@@ -26,7 +26,7 @@ import stdio
 # --> /CVC
 
 #Define Variables and Read edf
-single_execution = False
+single_execution = True
 
 #FILTERING FEATURES
 f_range = 'theta'
@@ -47,8 +47,8 @@ err=[]
 
 if single_execution:
     #%%
-    n_subj = 1
-    file = 3
+    n_subj = 12
+    file = 8
     show_plots = True
 
     name_edf = "chb{:02.0f}_{:02.0f}".format(n_subj, file)
@@ -73,6 +73,9 @@ if single_execution:
     #%%
     #Define max BandWidth and Theta
     #dic = setBandwidth(dic, dic_band_definitions['maxrange'], hz)
+    plt.figure()
+    plt.plot(dic['FP1-F7'], color="green", label="raw data")
+
     dic = fra.setBandwidth(dic, dic_band_definitions[f_range], hz)
     
 
@@ -87,12 +90,13 @@ if single_execution:
         print("Error in labeling!")
 
     if show_plots:
-        fra.Rawplot1Channel(dic)
-        fra.plotea(dic)
+        #fra.Rawplot1Channel(dic)
+        fra.plotea(dic, n_subj, file)
+        
 
-    fra.saveToParquet(dic, path_parquet)
-    fra.chunkData(path_parquet, dic_cut)
-    fra.saveToNumpy(path_parquet, path_numpy)
+    #fra.saveToParquet(dic, path_parquet)
+    #fra.chunkData(path_parquet, dic_cut)
+    #fra.saveToNumpy(path_parquet, path_numpy)
     
     
         
